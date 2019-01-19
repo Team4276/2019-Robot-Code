@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import frc.systems.DriveSystem;
+import frc.systems.sensors.Cameras;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -23,6 +24,7 @@ public class Robot extends TimedRobot {
   public static Joystick leftJoystick;
   public static Joystick rightJoystick;
   public static Timer systemTimer;
+	Cameras robotCameraSystem;
 
   DriveSystem mDriveSystem;
 
@@ -32,7 +34,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    mDriveSystem = new DriveSystem(1, 2, 5, 3, 4, 6);
+    robotCameraSystem = new Cameras();
+    leftJoystick = new Joystick(0);
+    rightJoystick = new Joystick(1);
+    mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1);
+    
   }
 
   /**
@@ -77,7 +83,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     mDriveSystem.operatorDrive();
-    // change
   }
 
   /**

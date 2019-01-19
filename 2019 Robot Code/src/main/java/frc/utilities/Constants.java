@@ -7,10 +7,20 @@
 
 package frc.utilities;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 /**
  * Add your docs here.
  */
 public class Constants {
+
+//for drive shifting gearbox
+
+public final static double SHIFT_TIME = 0.05; // sec
+
+public final static Value HI_GEAR_VALUE = DoubleSolenoid.Value.kForward;
+public final static Value LO_GEAR_VALUE = DoubleSolenoid.Value.kReverse;
 
     /**
      * Set to zero to skip waiting for confirmation. Set to nonzero to wait and

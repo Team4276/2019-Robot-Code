@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import frc.systems.DriveSystem;
 import frc.systems.sensors.Cameras;
+import frc.utilities.RoboRioPorts;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -24,7 +25,7 @@ public class Robot extends TimedRobot {
   public static Joystick leftJoystick;
   public static Joystick rightJoystick;
   public static Timer systemTimer;
-	Cameras robotCameraSystem;
+  Cameras robotCameraSystem;
 
   DriveSystem mDriveSystem;
 
@@ -37,8 +38,9 @@ public class Robot extends TimedRobot {
     robotCameraSystem = new Cameras();
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
-    mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1);
-    
+    mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
+        RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
+
   }
 
   /**

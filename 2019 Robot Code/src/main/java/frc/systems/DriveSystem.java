@@ -10,6 +10,7 @@ package frc.systems;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -46,10 +47,17 @@ public class DriveSystem {
 
     VictorSP flDrive, mlDrive, blDrive, frDrive, mrDrive, brDrive;
     VictorSPX flDriveX, mlDriveX, blDriveX, frDriveX, mrDriveX, brDriveX;
+    private double leftPower = 0;
+    private double rightPower = 0;
+
     double deadband = 0.05;
 
     public DriveSystem(boolean isCAN, int FLport, int MLport, int BLport, int FRport, int MRport, int BRport,
-            int shifterHi, int shifterLo) {
+            int shifterHi, int shifterLo, int rightBaseEncoderPortA, int rightBaseEncoderPortB,
+            int leftBaseEncoderPortA, int leftBaseEncoderPortB) {
+
+        rightBaseEncoder = new Encoder(rightBaseEncoderPortA, rightBaseEncoderPortB);
+        leftBaseEncoder = new Encoder(leftBaseEncoderPortA, leftBaseEncoderPortB);
         if (isCAN) {
             hasCANNetwork = true;
 
@@ -96,7 +104,8 @@ public class DriveSystem {
             mrDrive.set(rightPow);
             brDrive.set(rightPow);
         }
-
+        rightPower = rightPow;
+        leftPower = leftPow;
     }
 
     /**
@@ -122,7 +131,7 @@ public class DriveSystem {
 
             assignMotorPower(0, 0);
         }
-
+        updateTelemetry();
     }
 
     /**
@@ -219,8 +228,37 @@ public class DriveSystem {
 
     }
 
-    public void updateTelemetry(){
+    /**
+     * 
+     * @param targetDistance distance to travel
+     * @param powerMultiplier from 0 to 1 
+     * @return status of action (complete)
+     */
+    public boolean driveDistanceFwd(double targetDistance, double powerMultiplier) {
+        //establish gains
+        double P = Constants.regDrivePIDs[Constants.P];
+        double I = Constants.regDrivePIDs[Constants.I];
+        double D = Constants.regDrivePIDs[Constants.D];
         
+
+        return false;
+    }
+
+    /**
+     * updates smartdashboard
+     */
+    public void updateTelemetry() {
+        // encoder outputs
+        SmartDashboard.putNumber("Right Encoder", rightBaseEncoder.getDistance());
+        SmartDashboard.putNumber("Left Encoder", leftBaseEncoder.getDistance());
+        // shifting status
+        SmartDashboard.putBoolean("Shifting", isShifting);
+        // current gear
+        SmartDashboard.putBoolean("HI Gear", (currentGear == Gear.HI));
+        SmartDashboard.putBoolean("LOW Gear", (currentGear == Gear.LO));
+        // power outputs
+        SmartDashboard.putNumber("Right Power", rightPower);
+        SmartDashboard.putNumber("Left Power", leftPower);
     }
 
 }

@@ -9,9 +9,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.systems.DriveSystem;
 import frc.systems.sensors.Cameras;
+import frc.systems.sensors.IMU;
 import frc.utilities.RoboRioPorts;
+
+
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -24,10 +28,15 @@ import edu.wpi.first.wpilibj.Joystick;
 public class Robot extends TimedRobot {
   public static Joystick leftJoystick;
   public static Joystick rightJoystick;
+  public static Joystick xboxJoystick;
   public static Timer systemTimer;
-  Cameras robotCameraSystem;
+  public static IMU mImu;
 
+  Cameras robotCameraSystem;
   DriveSystem mDriveSystem;
+
+  private double timeCurr = 0;
+  private double timeLast = 0;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -35,9 +44,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    mImu = new IMU();
     robotCameraSystem = new Cameras();
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
+    xboxJoystick = new Joystick(2);
     mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
@@ -84,6 +95,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    timeCurr = systemTimer.get();
+    SmartDashboard.putNumber("Delta-T", timeCurr-timeLast);
+    timeLast = timeCurr;
+    
     mDriveSystem.operatorDrive();
   }
 

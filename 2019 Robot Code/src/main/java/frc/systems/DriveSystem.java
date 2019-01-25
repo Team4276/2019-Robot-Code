@@ -8,10 +8,10 @@
 package frc.systems;
 
 import frc.robot.Robot;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Notifier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -22,6 +22,7 @@ import frc.utilities.Constants;
 import frc.utilities.SoftwareTimer;
 
 import jaci.pathfinder.Pathfinder;
+import jaci.pathfinder.PathfinderFRC;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
 import jaci.pathfinder.modifiers.TankModifier;
@@ -29,11 +30,11 @@ import jaci.pathfinder.followers.EncoderFollower;
 
 public class DriveSystem {
 
-    private EncoderFollower leftFollower;
-    private EncoderFollower rightFollower;
+    private EncoderFollower m_left_follower;
+    private EncoderFollower m_right_follower;
 
-    private Encoder leftBaseEncoder;
-    private Encoder rightBaseEncoder;
+    private Encoder m_left_encoder;
+    private Encoder m_right_encoder;
 
     private boolean hasCANNetwork = false;
 
@@ -50,14 +51,17 @@ public class DriveSystem {
     private double leftPower = 0;
     private double rightPower = 0;
 
+    private boolean methodInit = true;
+    private Notifier m_follower_notifier;
+
     double deadband = 0.05;
 
     public DriveSystem(boolean isCAN, int FLport, int MLport, int BLport, int FRport, int MRport, int BRport,
             int shifterHi, int shifterLo, int rightBaseEncoderPortA, int rightBaseEncoderPortB,
             int leftBaseEncoderPortA, int leftBaseEncoderPortB) {
 
-        rightBaseEncoder = new Encoder(rightBaseEncoderPortA, rightBaseEncoderPortB);
-        leftBaseEncoder = new Encoder(leftBaseEncoderPortA, leftBaseEncoderPortB);
+        m_right_encoder = new Encoder(rightBaseEncoderPortA, rightBaseEncoderPortB);
+        m_left_encoder = new Encoder(leftBaseEncoderPortA, leftBaseEncoderPortB);
         if (isCAN) {
             hasCANNetwork = true;
 
@@ -230,27 +234,63 @@ public class DriveSystem {
 
     /**
      * 
-     * @param targetDistance distance to travel
-     * @param powerMultiplier from 0 to 1 
+     * @param targetDistance  distance to travel
+     * @param powerMultiplier from 0 to 1
      * @return status of action (complete)
      */
     public boolean driveDistanceFwd(double targetDistance, double powerMultiplier) {
-        //establish gains
+        // establish gains
         double P = Constants.regDrivePIDs[Constants.P];
         double I = Constants.regDrivePIDs[Constants.I];
         double D = Constants.regDrivePIDs[Constants.D];
-        
 
         return false;
     }
+
+    public boolean drivePath(String pathFileName) {
+        Trajectory left_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".left");
+        Trajectory right_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".right");
+
+        m_left_follower = new EncoderFollower(left_trajectory);
+        m_right_follower = new EncoderFollower(right_trajectory);
+
+        m_left_follower.configureEncoder(m_left_encoder.get(), Constants.TickPRev, Constants.wheelDiam);
+        // You must tune the PID values on the following line!
+        m_left_follower.configurePIDVA(Constants.kP, Constants.kI, Constants.kD, Constants.kV, Constants.kA);
+
+        m_right_follower.configureEncoder(m_right_encoder.get(), Constants.TickPRev, Constants.wheelDiam);
+        // You must tune the PID values on the following line!
+        m_right_follower.configurePIDVA(Constants.kP, Constants.kI, Constants.kD, Constants.kV, Constants.kA);
+
+        m_follower_notifier = new Notifier(this::followPath);
+        m_follower_notifier.startPeriodic(left_trajectory.get(0).dt);
+
+        return false;
+    }
+
+    private void followPath() {
+        if (m_left_follower.isFinished() || m_right_follower.isFinished()) {
+          m_follower_notifier.stop();
+        } else {
+          double left_speed = m_left_follower.calculate(m_left_encoder.get());
+          double right_speed = m_right_follower.calculate(m_right_encoder.get());
+          double heading = Robot.mImu.getYaw();
+          double desired_heading = Pathfinder.r2d(m_left_follower.getHeading());
+          double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
+          
+          double turn =  0.8 * (-1.0/80.0) * heading_difference;
+          
+          assignMotorPower(right_speed - turn, left_speed + turn);
+        }
+      }
 
     /**
      * updates smartdashboard
      */
     public void updateTelemetry() {
         // encoder outputs
-        SmartDashboard.putNumber("Right Encoder", rightBaseEncoder.getDistance());
-        SmartDashboard.putNumber("Left Encoder", leftBaseEncoder.getDistance());
+        SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
+        SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());
         // shifting status
         SmartDashboard.putBoolean("Shifting", isShifting);
         // current gear

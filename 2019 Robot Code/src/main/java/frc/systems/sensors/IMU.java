@@ -22,6 +22,10 @@ public class IMU {
         imu = new ADIS16448_IMU();
     }
 
+    public double getYaw(){
+        return imu.getYaw();
+    }
+
     public void giveReadouts(){ 
         SmartDashboard.putNumber("Gyro-X", imu.getAngleX());
         SmartDashboard.putNumber("Gyro-Y", imu.getAngleY());

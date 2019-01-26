@@ -10,11 +10,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Notifier;
 import frc.systems.DriveSystem;
 import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
 import frc.utilities.RoboRioPorts;
-
 
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   public static IMU mImu;
 
   Cameras robotCameraSystem;
+  Notifier rateGroup20Hz;
   DriveSystem mDriveSystem;
 
   private double timeCurr = 0;
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    systemTimer = new Timer();
     mImu = new IMU();
     robotCameraSystem = new Cameras();
     leftJoystick = new Joystick(0);
@@ -51,6 +53,8 @@ public class Robot extends TimedRobot {
     xboxJoystick = new Joystick(2);
     mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
+
+    rateGroup20Hz = new Notifier(mDriveSystem::operatorDrive);
 
   }
 
@@ -90,16 +94,27 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
   }
 
+  @Override
+  public void teleopInit() {
+    
+    rateGroup20Hz.startPeriodic(0.05);
+    super.teleopInit();
+  }
+
+  @Override
+  public void disabledInit() {
+    rateGroup20Hz.stop();
+    super.disabledInit();
+  }
+
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
     timeCurr = systemTimer.get();
-    SmartDashboard.putNumber("Delta-T", timeCurr-timeLast);
+    SmartDashboard.putNumber("Delta-T", timeCurr - timeLast);
     timeLast = timeCurr;
-    
-    mDriveSystem.operatorDrive();
   }
 
   /**

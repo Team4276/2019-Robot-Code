@@ -57,11 +57,12 @@ public class DriveSystem {
     double deadband = 0.05;
 
     public DriveSystem(boolean isCAN, int FLport, int MLport, int BLport, int FRport, int MRport, int BRport,
-            int shifterHi, int shifterLo, int rightBaseEncoderPortA, int rightBaseEncoderPortB,
-            int leftBaseEncoderPortA, int leftBaseEncoderPortB) {
+            int shifterHi, int shifterLo, int m_right_encoderPortA, int m_right_encoderPortB, int m_left_encoderPortA,
+            int m_left_encoderPortB) {
 
-        m_right_encoder = new Encoder(rightBaseEncoderPortA, rightBaseEncoderPortB);
-        m_left_encoder = new Encoder(leftBaseEncoderPortA, leftBaseEncoderPortB);
+        shiftTimer = new SoftwareTimer();
+        m_right_encoder = new Encoder(m_right_encoderPortA, m_right_encoderPortB);
+        m_left_encoder = new Encoder(m_left_encoderPortA, m_left_encoderPortB);
         if (isCAN) {
             hasCANNetwork = true;
 
@@ -270,19 +271,53 @@ public class DriveSystem {
 
     private void followPath() {
         if (m_left_follower.isFinished() || m_right_follower.isFinished()) {
-          m_follower_notifier.stop();
+            m_follower_notifier.stop();
         } else {
-          double left_speed = m_left_follower.calculate(m_left_encoder.get());
-          double right_speed = m_right_follower.calculate(m_right_encoder.get());
-          double heading = Robot.mImu.getYaw();
-          double desired_heading = Pathfinder.r2d(m_left_follower.getHeading());
-          double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
-          
-          double turn =  0.8 * (-1.0/80.0) * heading_difference;
-          
-          assignMotorPower(right_speed - turn, left_speed + turn);
+
+            double LVT = m_left_follower.getSegment().velocity;
+            double RVT = m_right_follower.getSegment().velocity;
+
+            double LVA = m_left_encoder.getRate();
+            double RVA = m_right_encoder.getRate();
+
+            double LPT = m_left_follower.getSegment().position;
+            double RPT = m_right_follower.getSegment().position;
+
+            double LPA = m_left_encoder.getDistance();
+            double RPA = m_right_encoder.getDistance();
+
+            double left_speed = m_left_follower.calculate(m_left_encoder.get());
+            double right_speed = m_right_follower.calculate(m_right_encoder.get());
+            double heading = Robot.mImu.getYaw();
+            double desired_heading = Pathfinder.r2d(m_left_follower.getHeading());
+            double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
+
+            double turn = 0.8 * (-1.0 / 80.0) * heading_difference;
+
+            SmartDashboard.putNumber("Left goal velocity", LVT);
+            SmartDashboard.putNumber("Right goal velocity", RVT);
+
+            SmartDashboard.putNumber("Left actual velocity", LVA);
+            SmartDashboard.putNumber("Right actual velocity", RVA);
+
+            SmartDashboard.putNumber("Left velocity difference", (LVT - LVA));
+            SmartDashboard.putNumber("Right velocity difference", (RVT - RVA));
+
+            SmartDashboard.putNumber("Left goal position", LPT);
+            SmartDashboard.putNumber("Right goal position", RPT);
+
+            SmartDashboard.putNumber("Left actual position", LPA);
+            SmartDashboard.putNumber("Right actual position", RPA);
+
+            SmartDashboard.putNumber("Left position difference", (LPT - LPA));
+            SmartDashboard.putNumber("Right position difference", (RPT - RPA));
+
+            SmartDashboard.putNumber("heading error:", heading_difference);
+            SmartDashboard.putNumber("turn power:", turn);
+
+            assignMotorPower(right_speed - turn, left_speed + turn);
         }
-      }
+    }
 
     /**
      * updates smartdashboard

@@ -23,15 +23,22 @@ public class RoboRioPorts {
 
 	public static final int CAN_INTAKE_L = 18;
 
+	public static final int CAN_LIFT_FRONT = 19;
+	public static final int CAN_LIFT_BACK = 20;
+
 	// *** PNUEMATICS ***
 	// Example:
 	// static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
 
-	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 3;
-	public static final int DRIVE_DOUBLE_SOLENOID_REV = 4;
+	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 2;
+	public static final int DRIVE_DOUBLE_SOLENOID_REV = 3;
 
 	public static final int EJECTOR_PISTON_FWD = 0;
 	public static final int EJECTOR_PISTON_REV = 1;
+
+	
+	public static final int DIVERTER_FWD = 0;
+	public static final int DIVERTER_REV = 1;
 
 	// *** DIO ***
 	// Example:

@@ -16,6 +16,8 @@ import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
 import frc.utilities.RoboRioPorts;
 
+import frc.systems.BallLift;
+
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -33,8 +35,12 @@ public class Robot extends TimedRobot {
   public static IMU mImu;
 
   Cameras robotCameraSystem;
-  Notifier rateGroup20Hz;
+
+  Notifier driveRateGroup;
   DriveSystem mDriveSystem;
+
+  Notifier liftRateGroup;
+  BallLift mBallLift;
 
   private double timeCurr = 0;
   private double timeLast = 0;
@@ -48,13 +54,18 @@ public class Robot extends TimedRobot {
     systemTimer = new Timer();
     mImu = new IMU();
     robotCameraSystem = new Cameras();
+
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
     xboxJoystick = new Joystick(2);
+
     mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    rateGroup20Hz = new Notifier(mDriveSystem::operatorDrive);
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD,
+        RoboRioPorts.DIVERTER_REV);
+
+    driveRateGroup = new Notifier(mDriveSystem::operatorDrive);
 
   }
 
@@ -96,14 +107,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    
-    rateGroup20Hz.startPeriodic(0.05);
+
+    driveRateGroup.startPeriodic(0.05);
     super.teleopInit();
   }
 
   @Override
   public void disabledInit() {
-    rateGroup20Hz.stop();
+    driveRateGroup.stop();
     super.disabledInit();
   }
 

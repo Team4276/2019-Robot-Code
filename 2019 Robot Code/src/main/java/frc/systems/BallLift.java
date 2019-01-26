@@ -1,8 +1,9 @@
-package org.usfirst.frc.team4276.robot;
+package frc.systems;
 
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import frc.robot.Robot;
 
 public class BallLift {
 
@@ -21,7 +22,7 @@ public class BallLift {
 		diverter.set(highPosition);
 	}
 	
-	public void performMain() {
+	public void performMainProcessing() {
 		
 		if(Robot.xboxJoystick.getRawButton(0)) {
 			reverse();

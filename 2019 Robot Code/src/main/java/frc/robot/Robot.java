@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import frc.systems.DriveSystem;
+import frc.systems.Ejector;
 import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
 import frc.utilities.RoboRioPorts;
-
+import frc.systems.ArmPivot;
 import frc.systems.BallLift;
-
+import frc.systems.Collector;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -42,6 +43,15 @@ public class Robot extends TimedRobot {
   Notifier liftRateGroup;
   BallLift mBallLift;
 
+  Notifier collectorRateGroup;
+  Collector mCollector;
+
+  Notifier ejectorRateGroup;
+  Ejector mEjector;
+
+  Notifier armRateGroup;
+  ArmPivot mArmPivot;
+
   private double timeCurr = 0;
   private double timeLast = 0;
 
@@ -62,11 +72,22 @@ public class Robot extends TimedRobot {
     mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD,
-        RoboRioPorts.DIVERTER_REV);
+    mBallLift = new BallLift(8, 9, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV);
+
+    mCollector = new Collector(7);
+
+    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD, RoboRioPorts.EJECTOR_PISTON_REV);
+
+    mArmPivot = new ArmPivot(RoboRioPorts.CAN_ARM_PIVOT1, RoboRioPorts.CAN_ARM_PIVOT2, RoboRioPorts.DIO_ARM_A,
+        RoboRioPorts.DIO_ARM_B, RoboRioPorts.ARM_LIM_SWITCH);
 
     driveRateGroup = new Notifier(mDriveSystem::operatorDrive);
+    liftRateGroup = new Notifier(mBallLift::performMainProcessing);
+    collectorRateGroup = new Notifier(mCollector::performMainProcessing);
+    ejectorRateGroup = new Notifier(mEjector::performMainProcessing);
+    armRateGroup = new Notifier(mArmPivot::performMainProcessing);
 
+    armRateGroup.startPeriodic(.025);
   }
 
   /**
@@ -80,6 +101,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
   }
 
   /**
@@ -96,6 +118,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    //mDriveSystem.drivePath("MidToFrontLeft");
   }
 
   /**
@@ -105,17 +128,43 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
   }
 
+  /**
+   * 
+   */
   @Override
   public void teleopInit() {
 
     driveRateGroup.startPeriodic(0.05);
+    liftRateGroup.startPeriodic(0.2);
+    collectorRateGroup.startPeriodic(0.2);
+    ejectorRateGroup.startPeriodic(0.2);
     super.teleopInit();
   }
 
+  /**
+   * 
+   */
   @Override
   public void disabledInit() {
+    ejectorRateGroup.stop();
+    collectorRateGroup.stop();
+    liftRateGroup.stop();
     driveRateGroup.stop();
     super.disabledInit();
+  }
+
+  /**
+   * 
+   */
+  @Override
+  public void disabledPeriodic() {
+    mDriveSystem.updateTelemetry();
+    mArmPivot.updateTelemetry();
+    mBallLift.updateTelemetry();
+    mCollector.updateTelemetry();
+    mEjector.updateTelemetry();
+
+    super.disabledPeriodic();
   }
 
   /**
@@ -123,9 +172,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    timeCurr = systemTimer.get();
-    SmartDashboard.putNumber("Delta-T", timeCurr - timeLast);
-    timeLast = timeCurr;
   }
 
   /**

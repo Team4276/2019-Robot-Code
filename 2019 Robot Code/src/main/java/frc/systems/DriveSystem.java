@@ -235,22 +235,32 @@ public class DriveSystem {
 
     /**
      * 
-     * @param targetDistance  distance to travel
+     * @param targetTime      distance to travel
      * @param powerMultiplier from 0 to 1
      * @return status of action (complete)
      */
-    public boolean driveDistanceFwd(double targetDistance, double powerMultiplier) {
+    public boolean driveFwd(double targetTime, double power) {
+        double followHeading = 0;
+        if (methodInit) {
+            followHeading = Robot.mImu.getYaw();
+            methodInit = false;
+        }
         // establish gains
-        double P = Constants.regDrivePIDs[Constants.P];
-        double I = Constants.regDrivePIDs[Constants.I];
-        double D = Constants.regDrivePIDs[Constants.D];
+        double P_turn = Constants.regDrivePIDs[Constants.P];
+
+        double heading_difference = followHeading - Robot.mImu.getYaw();
+
+        double turn = P_turn * heading_difference;
+
+        assignMotorPower(power + turn, power - turn);
 
         return false;
     }
 
     public boolean drivePath(String pathFileName) {
-        Trajectory left_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".left");
-        Trajectory right_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".right");
+       
+        Trajectory left_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".right");
+        Trajectory right_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".left");
 
         m_left_follower = new EncoderFollower(left_trajectory);
         m_right_follower = new EncoderFollower(right_trajectory);
@@ -323,6 +333,7 @@ public class DriveSystem {
      * updates smartdashboard
      */
     public void updateTelemetry() {
+        SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());

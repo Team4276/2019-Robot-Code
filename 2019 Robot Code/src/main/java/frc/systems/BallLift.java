@@ -3,7 +3,9 @@ package frc.systems;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
+import frc.utilities.Xbox;
 
 public class BallLift {
 
@@ -11,6 +13,9 @@ public class BallLift {
 	Value highPosition = DoubleSolenoid.Value.kReverse;
 	double backPower = 1;
 	double frontPower = 1;
+	boolean goingHi = false;
+	boolean goingLo = false;
+	boolean goingOut = false;
 	
 	VictorSP backroller, frontroller;
 	DoubleSolenoid diverter;
@@ -24,18 +29,19 @@ public class BallLift {
 	
 	public void performMainProcessing() {
 		
-		if(Robot.xboxJoystick.getRawButton(0)) {
+		if(Robot.xboxJoystick.getRawButton(Xbox.A)) {
 			reverse();
 		}
-		else if(Robot.xboxJoystick.getRawButton(1)){
+		else if(Robot.xboxJoystick.getRawButton(Xbox.B)){
 			lowScore();
 		}
-		else if(Robot.xboxJoystick.getRawButton(2)){
+		else if(Robot.xboxJoystick.getRawButton(Xbox.Y)){
 			highScore();
 		}
 		else{
 			stop();
 		}
+		updateTelemetry();
 	}
 	
 	public void lowScore() {
@@ -43,6 +49,10 @@ public class BallLift {
 		diverter.set(lowPosition);
 		frontroller.set(frontPower);
 		backroller.set(backPower);
+
+		goingHi = false;
+		goingLo = true;
+		goingOut = false;
 		
 	}
 	
@@ -51,6 +61,10 @@ public class BallLift {
 		diverter.set(highPosition);
 		frontroller.set(frontPower);
 		backroller.set(backPower);
+
+		goingHi = true;
+		goingLo = false;
+		goingOut = false;
 		
 	}
 	
@@ -59,6 +73,10 @@ public class BallLift {
 		frontroller.set(-frontPower);
 		backroller.set(-backPower);
 		
+		goingHi = false;
+		goingLo = false;
+		goingOut = true;
+		
 	}
 	
 	public void stop() {
@@ -66,6 +84,16 @@ public class BallLift {
 		frontroller.set(0);
 		backroller.set(0);
 		
+		goingHi = false;
+		goingLo = false;
+		goingOut = false;
+		
+	}
+	
+	public void updateTelemetry(){
+		SmartDashboard.putBoolean("High Goal:", goingHi);
+		SmartDashboard.putBoolean("Low Goal:", goingLo);
+		SmartDashboard.putBoolean("Outake:", goingOut);
 	}
 	
 }

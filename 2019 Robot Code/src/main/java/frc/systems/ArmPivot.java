@@ -1,10 +1,12 @@
 package frc.systems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 
 import frc.robot.Robot;
 import frc.utilities.Xbox;
@@ -13,11 +15,18 @@ import frc.utilities.Toggler;
 
 public class ArmPivot extends Thread implements Runnable {
 
-	private TalonSRX pivoter;
+	private VictorSPX pivoter1;
+	private VictorSPX pivoter2;
+	private DigitalInput calibrateSwitch;
 	private Toggler manualOverrideTogglerPivot;
 	private SoftwareTimer armTimer;
+	Encoder pivotEncoder;
 
 	// Constants
+	private final double CARGO_IN_SETPOINT = 45.0;
+	private final double HATCH_IN_SETPOINT = -5.0;
+	private final double UP_SETPOINT = 90.0;
+
 	private double STATIC_GAIN = 0.37;// 0.41 max 0.34 min
 	private double PROPORTIONAL_GAIN = 11600 * 1e-6;
 	private double INTEGRAL_GAIN = 430 * 1e-6;
@@ -36,7 +45,7 @@ public class ArmPivot extends Thread implements Runnable {
 	private boolean delayInit = true;
 	private boolean manualOverrideIsEngaged = false;
 	private double encoderOffset = 0;
-	private double estimatedAngle = 0; // deg
+	private double estimatedAngle = 90; // deg
 	private double commandedAngle = STARTING_ANGLE; // deg
 	private double manualPower = 0;
 	private double staticPower = 0;
@@ -53,11 +62,17 @@ public class ArmPivot extends Thread implements Runnable {
 	private double timePrevious;
 	private double timeStep;
 
-	public ArmPivot(int pivoterCANPort) {
-		pivoter = new TalonSRX(pivoterCANPort);
+	public ArmPivot(int pivoterCANPort1, int pivoterCANPort2, int encA, int encB, int limSwitchDIO) {
+		pivoter1 = new VictorSPX(pivoterCANPort1);
+		pivoter2 = new VictorSPX(pivoterCANPort2);
+		calibrateSwitch = new DigitalInput(limSwitchDIO);
+
 		manualOverrideTogglerPivot = new Toggler(Xbox.Back);
 		armTimer = new SoftwareTimer();
-		encoderOffset = STARTING_ANGLE - pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
+		pivotEncoder = new Encoder(encA, encB);
+		pivotEncoder.setDistancePerPulse(DEGREES_PER_PULSE);
+		pivotEncoder.reset();
+		encoderOffset = STARTING_ANGLE - pivotEncoder.getDistance();
 	}
 
 	private void computeManualPower() {
@@ -87,7 +102,7 @@ public class ArmPivot extends Thread implements Runnable {
 	private void computeActivePower() {
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
-			estimatedAngle = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE + encoderOffset;
+			estimatedAngle = pivotEncoder.getDistance() + encoderOffset;
 			angleError = commandedAngle - estimatedAngle;
 			accumulatedError = 0.0;
 			activePower = 0.0;
@@ -96,13 +111,13 @@ public class ArmPivot extends Thread implements Runnable {
 			angleErrorLast = angleError;
 			timePrevious = timeNow;
 			timeNow = Robot.systemTimer.get();
-			estimatedAngle = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE + encoderOffset;
+			estimatedAngle = pivotEncoder.getDistance();
 			timeStep = timeNow - timePrevious;
 
 			// Compute control errors
 			angleError = commandedAngle - estimatedAngle; // deg
 			accumulatedError = accumulatedError + (angleErrorLast + angleError) / 2 * timeStep; // deg*s
-			rateError = -pivoter.getSensorCollection().getQuadratureVelocity() * DEGREES_PER_PULSE * 10; // deg/s
+			rateError = -pivotEncoder.getDistance(); // deg/s
 
 			// For large height errors, follow coast speed until close to target
 			if (angleError > ANGLE_THRESHOLD) {
@@ -120,8 +135,12 @@ public class ArmPivot extends Thread implements Runnable {
 
 	private void determineSetpoint() {
 		// Determine commanded angle
-		if (Robot.xboxJoystick.getRawButton(Xbox.X)) {
-			commandedAngle = 0;
+		if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
+			commandedAngle = CARGO_IN_SETPOINT;
+		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LT) > 0.5) {
+			commandedAngle = HATCH_IN_SETPOINT;
+		} else if (Robot.xboxJoystick.getRawButton(Xbox.RB)) {
+			commandedAngle = UP_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) < -0.15) {
 			commandedAngle = commandedAngle + SETPOINT_INCREMENT;
 		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) > 0.15) {
@@ -143,6 +162,12 @@ public class ArmPivot extends Thread implements Runnable {
 		} else if (commandedPower < -MAX_POWER) {
 			commandedPower = -MAX_POWER;
 		}
+	}
+
+	private void calibrate() {
+		commandedAngle = UP_SETPOINT;
+		encoderOffset = UP_SETPOINT - pivotEncoder.getDistance();
+
 	}
 
 	private void tuneControlGains() {
@@ -172,8 +197,7 @@ public class ArmPivot extends Thread implements Runnable {
 		}
 	}
 
-	private void updateTelemetry() {
-		SmartDashboard.putNumber("current draw pivot", pivoter.getOutputCurrent());
+	public void updateTelemetry() {
 		SmartDashboard.putNumber("Commanded Arm Angle", commandedAngle);
 		SmartDashboard.putNumber("Estimated Arm Angle", estimatedAngle);
 		SmartDashboard.putBoolean("Pivoter override", manualOverrideIsEngaged);
@@ -207,24 +231,29 @@ public class ArmPivot extends Thread implements Runnable {
 	}
 
 	public void performMainProcessing() {
-			// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
-			// OUT FOR
-			// COMPETITION
-			manualOverrideTogglerPivot.updateMechanismState();
-			manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
-			if (manualOverrideIsEngaged) {
-				computeManualPower();
-				computeStaticPower();
-				computeActivePower();
-				commandedPower = manualPower;
-			} else {
-				determineSetpoint();
-				computeStaticPower();
-				computeActivePower();
-				commandedPower = staticPower + activePower;
-			}
-			limitCommandedPower();
-			pivoter.set(ControlMode.PercentOutput, commandedPower);
-			updateTelemetry();
+		// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+		// OUT FOR
+		// COMPETITION
+		//if (calibrateSwitch.get()) {
+		//	calibrate();
+		//}
+
+		manualOverrideTogglerPivot.updateMechanismState();
+		manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
+		if (manualOverrideIsEngaged) {
+			computeManualPower();
+			computeStaticPower();
+			computeActivePower();
+			commandedPower = manualPower;
+		} else {
+			determineSetpoint();
+			computeStaticPower();
+			computeActivePower();
+			commandedPower = staticPower + activePower;
+		}
+		limitCommandedPower();
+		pivoter1.set(ControlMode.PercentOutput, commandedPower);
+		pivoter2.set(ControlMode.PercentOutput, commandedPower);
+		updateTelemetry();
 	}
 }

@@ -4,7 +4,7 @@ import frc.robot.Robot;
 
 public class SoftwareTimer {
 
-	private double expirationTime;
+	private double expirationTime = 0;
 
 	public void setTimer(double timerValue) {
 		expirationTime = Robot.systemTimer.get() + timerValue;

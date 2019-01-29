@@ -30,15 +30,15 @@ public class RoboRioPorts {
 	// Example:
 	// static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
 
-	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 2;
-	public static final int DRIVE_DOUBLE_SOLENOID_REV = 3;
+	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
+	public static final int DRIVE_DOUBLE_SOLENOID_REV = 1;
 
-	public static final int EJECTOR_PISTON_FWD = 0;
-	public static final int EJECTOR_PISTON_REV = 1;
+	public static final int EJECTOR_PISTON_FWD = 2;
+	public static final int EJECTOR_PISTON_REV = 3;
 
 	
-	public static final int DIVERTER_FWD = 0;
-	public static final int DIVERTER_REV = 1;
+	public static final int DIVERTER_FWD = 4;
+	public static final int DIVERTER_REV = 5;
 
 	// *** DIO ***
 	// Example:
@@ -46,7 +46,15 @@ public class RoboRioPorts {
 
 	public static final int DIO_DRIVE_LEFT_A = 0;
 	public static final int DIO_DRIVE_LEFT_B = 1;
+
 	public static final int DIO_DRIVE_RIGHT_A = 2;
 	public static final int DIO_DRIVE_RIGHT_B = 3;
-	public static final int INTAKE_LIM_SWITCH = 4;
+	
+	public static final int DIO_ARM_A = 4;
+	public static final int DIO_ARM_B = 5;
+
+	public static final int INTAKE_LIM_SWITCH = 6;
+
+	public static final int ARM_LIM_SWITCH = 7;
+	
 }

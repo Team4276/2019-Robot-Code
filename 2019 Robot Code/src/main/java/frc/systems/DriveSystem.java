@@ -258,7 +258,7 @@ public class DriveSystem {
     }
 
     public boolean drivePath(String pathFileName) {
-       
+
         Trajectory left_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".right");
         Trajectory right_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".left");
 

@@ -12,8 +12,8 @@ public class Ejector {
     double activateTime = 0.25;
     boolean isEjecting = false;
 
-    public Ejector(int port1, int port2) {
-        ejectSol = new Solenoid(port1, port2);
+    public Ejector(int port1) {
+        ejectSol = new Solenoid(port1);
         ejectTime = new SoftwareTimer();
     }
 

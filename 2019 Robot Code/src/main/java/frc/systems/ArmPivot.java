@@ -16,7 +16,6 @@ import frc.utilities.Toggler;
 public class ArmPivot extends Thread implements Runnable {
 
 	private VictorSPX pivoter1;
-	private VictorSPX pivoter2;
 	private DigitalInput calibrateSwitch;
 	private Toggler manualOverrideTogglerPivot;
 	private SoftwareTimer armTimer;
@@ -62,9 +61,8 @@ public class ArmPivot extends Thread implements Runnable {
 	private double timePrevious;
 	private double timeStep;
 
-	public ArmPivot(int pivoterCANPort1, int pivoterCANPort2, int encA, int encB, int limSwitchDIO) {
+	public ArmPivot(int pivoterCANPort1, int encA, int encB, int limSwitchDIO) {
 		pivoter1 = new VictorSPX(pivoterCANPort1);
-		pivoter2 = new VictorSPX(pivoterCANPort2);
 		calibrateSwitch = new DigitalInput(limSwitchDIO);
 
 		manualOverrideTogglerPivot = new Toggler(Xbox.Back);
@@ -253,7 +251,6 @@ public class ArmPivot extends Thread implements Runnable {
 		}
 		limitCommandedPower();
 		pivoter1.set(ControlMode.PercentOutput, commandedPower);
-		pivoter2.set(ControlMode.PercentOutput, commandedPower);
 		updateTelemetry();
 	}
 }

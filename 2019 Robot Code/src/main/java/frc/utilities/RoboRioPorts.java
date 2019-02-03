@@ -18,7 +18,6 @@ public class RoboRioPorts {
 	public static final int CAN_DRIVE_L3 = 15;
 
 	public static final int CAN_ARM_PIVOT1 = 16;
-	public static final int CAN_ARM_PIVOT2 = 17;
 
 
 	public static final int CAN_INTAKE_L = 18;

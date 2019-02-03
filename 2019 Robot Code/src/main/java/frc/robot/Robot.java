@@ -62,24 +62,26 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     systemTimer = new Timer();
-    mImu = new IMU();
+    // mImu = new IMU();
     robotCameraSystem = new Cameras();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
     xboxJoystick = new Joystick(2);
 
-    mDriveSystem = new DriveSystem(false, 1, 2, 5, 3, 4, 6, 0, 1, RoboRioPorts.DIO_DRIVE_RIGHT_A,
+    mDriveSystem = new DriveSystem(true, RoboRioPorts.CAN_DRIVE_L1, RoboRioPorts.CAN_DRIVE_L2,
+        RoboRioPorts.CAN_DRIVE_L3, RoboRioPorts.CAN_DRIVE_R1, RoboRioPorts.CAN_DRIVE_R2, RoboRioPorts.CAN_DRIVE_R3,
+        RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
     mBallLift = new BallLift(8, 9, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV);
 
     mCollector = new Collector(7);
 
-    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD, RoboRioPorts.EJECTOR_PISTON_REV);
+    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD);
 
-    mArmPivot = new ArmPivot(RoboRioPorts.CAN_ARM_PIVOT1, RoboRioPorts.CAN_ARM_PIVOT2, RoboRioPorts.DIO_ARM_A,
-        RoboRioPorts.DIO_ARM_B, RoboRioPorts.ARM_LIM_SWITCH);
+    mArmPivot = new ArmPivot(RoboRioPorts.CAN_ARM_PIVOT1, RoboRioPorts.DIO_ARM_A, RoboRioPorts.DIO_ARM_B,
+        RoboRioPorts.ARM_LIM_SWITCH);
 
     driveRateGroup = new Notifier(mDriveSystem::operatorDrive);
     liftRateGroup = new Notifier(mBallLift::performMainProcessing);
@@ -118,7 +120,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    //mDriveSystem.drivePath("MidToFrontLeft");
+    String error = "false";
+    try {
+      SmartDashboard.putString("AUTO ERROR:", error);
+      mDriveSystem.drivePath("MidToFrontLeft");
+    } catch (Exception e) {
+      error = e.getMessage();
+      SmartDashboard.putString("AUTO ERROR:", error);
+      // TODO: handle exception
+    }
   }
 
   /**
@@ -138,6 +148,7 @@ public class Robot extends TimedRobot {
     liftRateGroup.startPeriodic(0.2);
     collectorRateGroup.startPeriodic(0.2);
     ejectorRateGroup.startPeriodic(0.2);
+    
     super.teleopInit();
   }
 
@@ -150,6 +161,7 @@ public class Robot extends TimedRobot {
     collectorRateGroup.stop();
     liftRateGroup.stop();
     driveRateGroup.stop();
+
     super.disabledInit();
   }
 

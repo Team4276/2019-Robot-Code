@@ -34,10 +34,12 @@ public class Robot extends TimedRobot {
   public static Joystick xboxJoystick;
   public static Timer systemTimer;
   public static IMU mImu;
+  public static int nSequenceVisionSystem;
+  public static JTargetInfo visionTargetInfo;
 
   Cameras robotCameraSystem;
-  JTargetInfo visionTargetInfo;
   JReceiver visionInfoReceiver;
+	Thread visionThread;
 
   Notifier driveRateGroup;
   DriveSystem mDriveSystem;
@@ -66,8 +68,11 @@ public class Robot extends TimedRobot {
     systemTimer = new Timer();
     // mImu = new IMU();
     robotCameraSystem = new Cameras();
-    visionTargetInfo = new JTargetInfo();
     visionInfoReceiver = new JReceiver();
+    visionTargetInfo = new JTargetInfo();
+    nSequenceVisionSystem = 0;
+    visionThread = new Thread(new JVisionSystemReceiverRunnable());
+    //visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);

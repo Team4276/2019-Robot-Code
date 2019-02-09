@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4276.robot;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -11,15 +11,13 @@ public class JVisionSystemReceiverRunnable implements Runnable
     boolean m_continueRunning;
 
     JReceiver m_visionSystemReceiver;
-    JTargetInfo m_visionSystemTargetInfo;
 
     @Override
     public void run() {
         m_visionSystemReceiver = new JReceiver();
-        m_visionSystemTargetInfo = new JTargetInfo();
         m_visionSystemReceiver.init();
   
-        SmartDashboard.putNumber("visionSystemPixelX",Robot.g_visionSystemPixelX);                
+        SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
 
         String textInput;
         m_continueRunning = true;
@@ -28,20 +26,17 @@ public class JVisionSystemReceiverRunnable implements Runnable
             textInput = m_visionSystemReceiver.getOneLineFromSocket();
             if(textInput != null)
             {
-                Robot.g_nSequenceVisionSystem++;
-                SmartDashboard.putNumber("visionSystemPixelX",Robot.g_visionSystemPixelX);                
+                Robot.nSequenceVisionSystem++;
+                SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
                 //System.out.println(textInput);
-                Robot.g_isVisionSystemGoalDetected = m_visionSystemTargetInfo.m_isUpperGoalFound;
-                Robot.g_visionSystemAngleRobotToGoal = m_visionSystemTargetInfo.m_angleFromStraightAheadToUpperGoal;
-                Robot.g_visionSystemPixelX = m_visionSystemTargetInfo.m_pixelX;
+                Robot.visionTargetInfo.initTargetInfoFromText(textInput);
                 
-                SmartDashboard.putBoolean("isVisionSystemGoalDetected",Robot.g_isVisionSystemGoalDetected); 
-                SmartDashboard.putNumber("visionSystemAngleRobotToGoal",Robot.g_visionSystemAngleRobotToGoal);                
-                SmartDashboard.putNumber("visionSystemPixelX",Robot.g_visionSystemPixelX);                
+                SmartDashboard.putBoolean("isVisionSystemGoalDetected", Robot.visionTargetInfo.isCargoBayDetected); 
+                SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
             }
             else
             {
-                Robot.g_isVisionSystemGoalDetected = false;
+                Robot.visionTargetInfo.isCargoBayDetected = false;
             }
         }
     }

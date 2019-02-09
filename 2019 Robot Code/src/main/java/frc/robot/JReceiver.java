@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,8 +19,7 @@ import java.net.UnknownHostException;
  */
 public class JReceiver
 {
-    JTargetInfo m_currentTargetInfo = null;
-    String m_host = "10.42.76.10";
+    String m_host = "10.42.76.8";
     Socket m_bbbTextSocket = null;
     PrintWriter m_out = null;
     BufferedReader m_in = null;
@@ -28,9 +29,8 @@ public class JReceiver
     {
         try
         {
-            m_currentTargetInfo = new JTargetInfo();
             m_initOK = false;
-            m_bbbTextSocket = new Socket(m_host, 1180);
+            m_bbbTextSocket = new Socket(m_host, 5801);
             m_out = new PrintWriter(m_bbbTextSocket.getOutputStream(), true);
             m_in = new BufferedReader(new InputStreamReader(m_bbbTextSocket.getInputStream()));
         } catch (UnknownHostException e)
@@ -46,15 +46,26 @@ public class JReceiver
         if (m_out == null)
         {
             System.err.println("OUT == null");
-        } else
+        } else if (m_in == null)
         {
-            if (m_in == null)
-            {
-                System.err.println("IN == null");
-                m_initOK = false;
-            }
+            System.err.println("IN == null");
+            m_initOK = false;
         }
 
         m_initOK = true;
+            
+        m_out.println("GET");   // Tells the BeagleBone to start sending text
+    }
+    
+    String getOneLineFromSocket()
+    {
+        String textInput;
+        try {
+            textInput = m_in.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(JReceiver.class.getName()).log(Level.SEVERE, null, ex);
+            textInput = null;
+        }
+       return textInput;
     }
 }

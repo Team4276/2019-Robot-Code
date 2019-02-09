@@ -36,6 +36,8 @@ public class Robot extends TimedRobot {
   public static IMU mImu;
 
   Cameras robotCameraSystem;
+  JTargetInfo visionTargetInfo;
+  JReceiver visionInfoReceiver;
 
   Notifier driveRateGroup;
   DriveSystem mDriveSystem;
@@ -64,6 +66,8 @@ public class Robot extends TimedRobot {
     systemTimer = new Timer();
     // mImu = new IMU();
     robotCameraSystem = new Cameras();
+    visionTargetInfo = new JTargetInfo();
+    visionInfoReceiver = new JReceiver();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);

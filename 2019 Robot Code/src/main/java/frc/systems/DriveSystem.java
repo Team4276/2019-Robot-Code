@@ -333,7 +333,7 @@ public class DriveSystem {
      * updates smartdashboard
      */
     public void updateTelemetry() {
-        SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
+       // SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());

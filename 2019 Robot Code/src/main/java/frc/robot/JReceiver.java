@@ -4,64 +4,48 @@
  */
 package frc.robot;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author acappon
- */
 public class JReceiver
 {
-    String m_host = "10.42.76.8";
-    Socket m_bbbTextSocket = null;
-    PrintWriter m_out = null;
-    BufferedReader m_in = null;
-    Boolean m_initOK = false;
+    String m_host = JTargetInfo.ipAddressRaspberryPi;	
+    DatagramSocket  m_bbbTextSocket = null;
+    boolean m_initOK = false;
 
     void init()
     {
-        try
-        {
-            m_initOK = false;
-            m_bbbTextSocket = new Socket(m_host, 5801);
-            m_out = new PrintWriter(m_bbbTextSocket.getOutputStream(), true);
-            m_in = new BufferedReader(new InputStreamReader(m_bbbTextSocket.getInputStream()));
-        } catch (UnknownHostException e)
-        {
-            System.err.println("Don't know about host: " + m_host);
-            m_initOK = false;
-
-        } catch (IOException e)
-        {
-            System.err.println("Couldn't get I/O for the connection to: " + m_host);
-            m_initOK = false;
-        }
-        if (m_out == null)
-        {
-            System.err.println("OUT == null");
-        } else if (m_in == null)
-        {
-            System.err.println("IN == null");
-            m_initOK = false;
-        }
-
-        m_initOK = true;
-            
-        m_out.println("GET");   // Tells the BeagleBone to start sending text
+    	boolean isOK = true;
+    	if(m_bbbTextSocket == null)
+    	{
+	        try
+	        {
+        		m_bbbTextSocket = new DatagramSocket(JTargetInfo.textPortRoboRioReceive);
+        	}
+	        catch (Exception e)
+	        {
+	            System.err.println("Couldn't get I/O for the connection to: " + m_host);
+	            isOK = false;
+	        }
+    	}
+        m_initOK = isOK;
     }
     
     String getOneLineFromSocket()
     {
+    	if(!m_initOK)
+    	{
+    		return null;
+    	}
         String textInput;
+        byte[] buf = new byte[256];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
-            textInput = m_in.readLine();
+	        m_bbbTextSocket.receive(packet);       
+	        textInput = new String(packet.getData(), 0, packet.getLength());
         } catch (IOException ex) {
             Logger.getLogger(JReceiver.class.getName()).log(Level.SEVERE, null, ex);
             textInput = null;

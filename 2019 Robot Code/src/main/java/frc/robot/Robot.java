@@ -15,7 +15,9 @@ import frc.systems.DriveSystem;
 import frc.systems.Ejector;
 import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
+import frc.systems.sensors.ADIS16448_IMU;
 import frc.utilities.RoboRioPorts;
+import frc.autonomous.DashboardInterface;
 import frc.systems.ArmPivot;
 import frc.systems.BallLift;
 import frc.systems.Collector;
@@ -34,30 +36,31 @@ public class Robot extends TimedRobot {
   public static Joystick xboxJoystick;
   public static Timer systemTimer;
   public static IMU mImu;
+  public static ADIS16448_IMU robotIMU;
+
   public static int nSequenceVisionSystem;
   public static JTargetInfo visionTargetInfo;
 
   Cameras robotCameraSystem;
   JReceiver visionInfoReceiver;
-	Thread visionThread;
+  Thread visionThread;
+
+  public static DashboardInterface mSDBInterface;
 
   Notifier driveRateGroup;
-  DriveSystem mDriveSystem;
+  public static DriveSystem mDriveSystem;
 
   Notifier liftRateGroup;
-  BallLift mBallLift;
+  static BallLift mBallLift;
 
   Notifier collectorRateGroup;
-  Collector mCollector;
+  static Collector mCollector;
 
   Notifier ejectorRateGroup;
-  Ejector mEjector;
+  public static Ejector mEjector;
 
   Notifier armRateGroup;
-  ArmPivot mArmPivot;
-
-  private double timeCurr = 0;
-  private double timeLast = 0;
+  public static ArmPivot mArmPivot;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -67,12 +70,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     systemTimer = new Timer();
     // mImu = new IMU();
+    // robotIMU = new ADIS16448_IMU();
+    // robotIMU.calibrate();
+
     robotCameraSystem = new Cameras();
     visionInfoReceiver = new JReceiver();
     visionTargetInfo = new JTargetInfo();
     nSequenceVisionSystem = 0;
     visionThread = new Thread(new JVisionSystemReceiverRunnable());
-    //visionThread.start();
+    // visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
@@ -157,7 +163,7 @@ public class Robot extends TimedRobot {
     liftRateGroup.startPeriodic(0.2);
     collectorRateGroup.startPeriodic(0.2);
     ejectorRateGroup.startPeriodic(0.2);
-    
+
     super.teleopInit();
   }
 

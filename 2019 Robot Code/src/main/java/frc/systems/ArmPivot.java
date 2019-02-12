@@ -22,27 +22,30 @@ public class ArmPivot extends Thread implements Runnable {
 	Encoder pivotEncoder;
 
 	// Constants
-	private final double CARGO_IN_SETPOINT = 45.0;
-	private final double HATCH_IN_SETPOINT = -5.0;
-	private final double UP_SETPOINT = 90.0;
+	private final double CARGO_IN_SETPOINT = 0.0;
+	private final double DOWN_SETPOINT = -90.0;
 
-	private double STATIC_GAIN = 0.37;// 0.41 max 0.34 min
-	private double PROPORTIONAL_GAIN = 11600 * 1e-6;
-	private double INTEGRAL_GAIN = 430 * 1e-6;
-	private double DERIVATIVE_GAIN = 3110 * 1e-6;
-	private final double STARTING_ANGLE = 90;
+	private final double UP_SETPOINT = 85.0;
+
+	private final double BACKDRIVE_POWER = 0.3;
+
+	private double STATIC_GAIN = 0.0;// 0.41 max 0.34 min
+	private double PROPORTIONAL_GAIN = 0.0;
+	private double INTEGRAL_GAIN = 0.0;
+	private double DERIVATIVE_GAIN = 0.0;
+	private final double STARTING_ANGLE = DOWN_SETPOINT;
 	private final double SETPOINT_INCREMENT = 5; // deg
 	private final double MAX_POWER = 1;
 	private final double UPPER_LIMIT = 85;
-	private final double LOWER_LIMIT = -10;
-	private final double DEGREES_PER_PULSE = 0.0004459828; // 0.0004459828
-															// actual robot
+	private final double LOWER_LIMIT = -90;
+	private final double DEGREES_PER_PULSE = (-0.2036244521);
 	private final double ANGLE_THRESHOLD = 90; // deg
 	private final double ANGLE_COAST_RATE = 90; // deg/s
 
 	// General parameters
 	private boolean delayInit = true;
 	private boolean manualOverrideIsEngaged = false;
+	private boolean isBackDriven = false;
 	private double encoderOffset = 0;
 	private double estimatedAngle = 90; // deg
 	private double commandedAngle = STARTING_ANGLE; // deg
@@ -135,8 +138,6 @@ public class ArmPivot extends Thread implements Runnable {
 		// Determine commanded angle
 		if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
 			commandedAngle = CARGO_IN_SETPOINT;
-		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LT) > 0.5) {
-			commandedAngle = HATCH_IN_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.RB)) {
 			commandedAngle = UP_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) < -0.15) {
@@ -199,6 +200,7 @@ public class ArmPivot extends Thread implements Runnable {
 		SmartDashboard.putNumber("Commanded Arm Angle", commandedAngle);
 		SmartDashboard.putNumber("Estimated Arm Angle", estimatedAngle);
 		SmartDashboard.putBoolean("Pivoter override", manualOverrideIsEngaged);
+		SmartDashboard.putBoolean("Pivoter BackDrive", isBackDriven);
 
 		SmartDashboard.putNumber("Pivoter Kstatic", STATIC_GAIN);
 		SmartDashboard.putNumber("Pivoter Kp*1e-6", PROPORTIONAL_GAIN * 1e6);
@@ -228,25 +230,42 @@ public class ArmPivot extends Thread implements Runnable {
 		}
 	}
 
+	public boolean backDrive(boolean state) {
+		if (state) {
+
+			if (estimatedAngle > 85.0) {
+				isBackDriven = true;
+				return true;
+			} else {
+				isBackDriven = false;
+				return false;
+			}
+		} else {
+			isBackDriven = false;
+			return true;
+		}
+	}
+
 	public void performMainProcessing() {
 		// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
 		// OUT FOR
 		// COMPETITION
-		//if (calibrateSwitch.get()) {
-		//	calibrate();
-		//}
+		// if (calibrateSwitch.get()) {
+		// calibrate();
+		// }
+
+		computeManualPower();
+		computeStaticPower();
+		computeActivePower();
+
+		manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
 
 		manualOverrideTogglerPivot.updateMechanismState();
-		manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
 		if (manualOverrideIsEngaged) {
-			computeManualPower();
-			computeStaticPower();
-			computeActivePower();
 			commandedPower = manualPower;
+		} else if (isBackDriven) {
+			commandedPower = BACKDRIVE_POWER;
 		} else {
-			determineSetpoint();
-			computeStaticPower();
-			computeActivePower();
 			commandedPower = staticPower + activePower;
 		}
 		limitCommandedPower();

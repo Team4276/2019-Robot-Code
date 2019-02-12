@@ -42,6 +42,7 @@ public class DriveSystem {
     public final int HI_SHIFTER = 4;
     public final int LO_SHIFTER = 3;
     SoftwareTimer shiftTimer;
+    SoftwareTimer driveTimer;
     private boolean shiftInit = true;
     private boolean isShifting = false;
     private Gear currentGear;
@@ -61,6 +62,7 @@ public class DriveSystem {
             int m_left_encoderPortB) {
 
         shiftTimer = new SoftwareTimer();
+        driveTimer = new SoftwareTimer();
         m_right_encoder = new Encoder(m_right_encoderPortA, m_right_encoderPortB);
         m_left_encoder = new Encoder(m_left_encoderPortA, m_left_encoderPortB);
         if (isCAN) {
@@ -95,6 +97,7 @@ public class DriveSystem {
 
     public void assignMotorPower(double rightPow, double leftPow) {
         if (hasCANNetwork) {
+            SmartDashboard.putBoolean("Drive check", true);
             flDriveX.set(ControlMode.PercentOutput, leftPow);
             mlDriveX.set(ControlMode.PercentOutput, leftPow);
             blDriveX.set(ControlMode.PercentOutput, leftPow);
@@ -122,10 +125,10 @@ public class DriveSystem {
         double rightY = 0;
 
         if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
-            leftY = Math.pow(Robot.leftJoystick.getY(), 3);
+            leftY = -Math.pow(Robot.leftJoystick.getY(), 3);
         }
         if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-            rightY = -Math.pow(Robot.rightJoystick.getY(), 3);
+            rightY = Math.pow(Robot.rightJoystick.getY(), 3);
         }
 
         checkForGearShift();
@@ -242,6 +245,7 @@ public class DriveSystem {
     public boolean driveFwd(double targetTime, double power) {
         double followHeading = 0;
         if (methodInit) {
+            driveTimer.setTimer(targetTime);
             followHeading = Robot.mImu.getYaw();
             methodInit = false;
         }
@@ -254,6 +258,10 @@ public class DriveSystem {
 
         assignMotorPower(power + turn, power - turn);
 
+        if(driveTimer.isExpired()){
+            assignMotorPower(0,0);
+            return true;
+        }
         return false;
     }
 
@@ -333,7 +341,7 @@ public class DriveSystem {
      * updates smartdashboard
      */
     public void updateTelemetry() {
-       // SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
+        //SmartDashboard.putNumber("Heading", Robot.robotIMU.getYaw());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());

@@ -1,6 +1,7 @@
 package frc.systems;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.utilities.Xbox;
@@ -19,25 +20,33 @@ public class Ejector {
 
     public void performMainProcessing() {
         if (Math.abs(Robot.xboxJoystick.getRawAxis(Xbox.RT)) > .2) {
-            Eject();
-        }
-        else{
+            eject();
+            if (!Robot.mArmPivot.backDrive(true)) {
+                Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5);
+            } else {
+                Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0);
+            }
+        } else {
+            Robot.mArmPivot.backDrive(false);
+            Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0);
             unject();
         }
         updateTelemetry();
     }
 
-    public void Eject() {
+    public void eject() {
         isEjecting = true;
         ejectSol.set(true);
-        //ejectTime.setTimer(activateTime);
+        // ejectTime.setTimer(activateTime);
 
     }
+
     public void unject() {
         isEjecting = false;
         ejectSol.set(false);
 
     }
+
     public void checkForUnject() {
         if (ejectTime.isExpired()) {
             ejectSol.set(false);

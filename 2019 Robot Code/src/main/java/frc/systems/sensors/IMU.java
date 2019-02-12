@@ -11,15 +11,15 @@ import com.analog.adis16448.frc.ADIS16448_IMU;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * Add your docs here.
- */
+
 public class IMU {
 
     ADIS16448_IMU imu;
 
     public IMU (){
         imu = new ADIS16448_IMU();
+        imu.reset();
+        imu.calibrate();
     }
 
     public double getYaw(){

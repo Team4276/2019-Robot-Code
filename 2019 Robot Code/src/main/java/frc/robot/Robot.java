@@ -160,8 +160,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
 
     driveRateGroup.startPeriodic(0.05);
-    liftRateGroup.startPeriodic(0.2);
-    collectorRateGroup.startPeriodic(0.2);
+    liftRateGroup.startPeriodic(0.1);
+    collectorRateGroup.startPeriodic(0.1);
     ejectorRateGroup.startPeriodic(0.2);
 
     super.teleopInit();

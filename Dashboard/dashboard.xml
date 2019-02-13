@@ -1,5 +1,10 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Collecting:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="942" y="123"/>
+		<width>94</width>
+		<height>23</height>
+	</widget>
 	<widget field="Drive check" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="462"/>
 	</widget>
@@ -10,7 +15,7 @@
 		<location x="10" y="245"/>
 	</widget>
 	<widget field="Outake:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="973" y="82"/>
+		<location x="949" y="61"/>
 		<width>99</width>
 		<height>58</height>
 	</widget>
@@ -48,13 +53,10 @@
 		<location x="0" y="315"/>
 	</widget>
 	<widget field="Estimated Arm Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="294"/>
+		<location x="475" y="309"/>
 	</widget>
 	<widget field="Commanded Arm Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="273"/>
-	</widget>
-	<widget field="Collecting:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="210"/>
+		<location x="262" y="304"/>
 	</widget>
 	<widget field="Left Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="189"/>

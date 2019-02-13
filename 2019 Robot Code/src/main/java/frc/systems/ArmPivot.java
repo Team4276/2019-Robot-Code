@@ -30,12 +30,12 @@ public class ArmPivot extends Thread implements Runnable {
 	private final double BACKDRIVE_POWER = 0.3;
 
 	private double STATIC_GAIN = 0.0;// 0.41 max 0.34 min
-	private double PROPORTIONAL_GAIN = 0.0;
-	private double INTEGRAL_GAIN = 0.0;
-	private double DERIVATIVE_GAIN = 0.0;
+	private double PROPORTIONAL_GAIN = 65800e-6;
+	private double INTEGRAL_GAIN = 7600e-6;
+	private double DERIVATIVE_GAIN = -3450e-6;
 	private final double STARTING_ANGLE = DOWN_SETPOINT;
 	private final double SETPOINT_INCREMENT = 5; // deg
-	private final double MAX_POWER = 1;
+	private final double MAX_POWER = 0.8;
 	private final double UPPER_LIMIT = 85;
 	private final double LOWER_LIMIT = -90;
 	private final double DEGREES_PER_PULSE = (-0.2036244521);
@@ -101,6 +101,7 @@ public class ArmPivot extends Thread implements Runnable {
 	}
 
 	private void computeActivePower() {
+		determineSetpoint();
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
 			estimatedAngle = pivotEncoder.getDistance() + encoderOffset;
@@ -112,7 +113,7 @@ public class ArmPivot extends Thread implements Runnable {
 			angleErrorLast = angleError;
 			timePrevious = timeNow;
 			timeNow = Robot.systemTimer.get();
-			estimatedAngle = pivotEncoder.getDistance();
+			estimatedAngle = pivotEncoder.getDistance() + encoderOffset;
 			timeStep = timeNow - timePrevious;
 
 			// Compute control errors
@@ -247,7 +248,7 @@ public class ArmPivot extends Thread implements Runnable {
 	}
 
 	public void performMainProcessing() {
-		// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+		tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
 		// OUT FOR
 		// COMPETITION
 		// if (calibrateSwitch.get()) {
@@ -263,13 +264,11 @@ public class ArmPivot extends Thread implements Runnable {
 		manualOverrideTogglerPivot.updateMechanismState();
 		if (manualOverrideIsEngaged) {
 			commandedPower = manualPower;
-		} else if (isBackDriven) {
-			commandedPower = BACKDRIVE_POWER;
 		} else {
 			commandedPower = staticPower + activePower;
 		}
 		limitCommandedPower();
-		pivoter1.set(ControlMode.PercentOutput, commandedPower);
+		pivoter1.set(ControlMode.PercentOutput, -commandedPower);
 		updateTelemetry();
 	}
 }

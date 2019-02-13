@@ -12,22 +12,21 @@ public class Collector {
     double outtakeSpeed = -1;
     boolean isCollecting = false;
 
-    public Collector(int port1) {
-        motor = new VictorSP(port1);
+    public Collector() {
     }
 
     public void intake() {
-        motor.set(intakeSpeed);
+        Robot.mBallLift.collect();
         isCollecting = true;
     }
 
     public void outtake() {
-        motor.set(outtakeSpeed);
+        Robot.mBallLift.reverse();
         isCollecting = true;
     }
 
     public void stop() {
-        motor.set(0);
+        Robot.mBallLift.stop();
         isCollecting = false;
     }
 

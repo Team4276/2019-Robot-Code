@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
   public static DriveSystem mDriveSystem;
 
   Notifier liftRateGroup;
-  static BallLift mBallLift;
+  public static BallLift mBallLift;
 
   Notifier collectorRateGroup;
   static Collector mCollector;
@@ -89,9 +89,9 @@ public class Robot extends TimedRobot {
         RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(8, 9, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV);
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV);
 
-    mCollector = new Collector(7);
+    mCollector = new Collector();
 
     mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD);
 
@@ -162,7 +162,7 @@ public class Robot extends TimedRobot {
     driveRateGroup.startPeriodic(0.05);
     liftRateGroup.startPeriodic(0.1);
     collectorRateGroup.startPeriodic(0.1);
-    ejectorRateGroup.startPeriodic(0.2);
+    //ejectorRateGroup.startPeriodic(0.2);
 
     super.teleopInit();
   }

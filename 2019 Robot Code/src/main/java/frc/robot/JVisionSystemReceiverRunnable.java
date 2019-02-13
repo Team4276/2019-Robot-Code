@@ -1,6 +1,6 @@
 package frc.robot;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
@@ -17,8 +17,6 @@ public class JVisionSystemReceiverRunnable implements Runnable
         m_visionSystemReceiver = new JReceiver();
         m_visionSystemReceiver.init();
   
-        //SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
-
         String textInput;
         m_continueRunning = true;
         while(m_continueRunning) 
@@ -27,12 +25,10 @@ public class JVisionSystemReceiverRunnable implements Runnable
             if(textInput != null)
             {
                 Robot.nSequenceVisionSystem++;
-                //SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
-                //System.out.println(textInput);
+                SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
                 Robot.visionTargetInfo.initTargetInfoFromText(textInput);
                 
-               //SmartDashboard.putBoolean("isVisionSystemGoalDetected", Robot.visionTargetInfo.isCargoBayDetected); 
-                //SmartDashboard.putNumber("visionSystemPixelX",Robot.visionTargetInfo.visionPixelX);                
+                SmartDashboard.putBoolean("isVisionSystemGoalDetected", Robot.visionTargetInfo.isCargoBayDetected); 
             }
             else
             {

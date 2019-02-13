@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
     visionTargetInfo = new JTargetInfo();
     nSequenceVisionSystem = 0;
     visionThread = new Thread(new JVisionSystemReceiverRunnable());
-    // visionThread.start();
+    visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
+      SmartDashboard.putNumber("Vision Communication Seq#:", visionTargetInfo.nSequence);
   }
 
   /**

@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
   public static Timer systemTimer;
   public static IMU mImu;
   public static ADIS16448_IMU robotIMU;
+  public static boolean isEnabled;
 
   public static int nSequenceVisionSystem;
   public static JTargetInfo visionTargetInfo;
@@ -78,7 +79,7 @@ public class Robot extends TimedRobot {
     visionTargetInfo = new JTargetInfo();
     nSequenceVisionSystem = 0;
     visionThread = new Thread(new JVisionSystemReceiverRunnable());
-    visionThread.start();
+    // visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
@@ -89,7 +90,7 @@ public class Robot extends TimedRobot {
         RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV);
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD);
 
     mCollector = new Collector();
 
@@ -118,7 +119,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-      SmartDashboard.putNumber("Vision Communication Seq#:", visionTargetInfo.nSequence);
+
   }
 
   /**
@@ -135,6 +136,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    isEnabled = true;
     String error = "false";
     try {
       SmartDashboard.putString("AUTO ERROR:", error);
@@ -158,11 +160,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopInit() {
-
+    isEnabled = true;
     driveRateGroup.startPeriodic(0.05);
     liftRateGroup.startPeriodic(0.1);
     collectorRateGroup.startPeriodic(0.1);
-    //ejectorRateGroup.startPeriodic(0.2);
+    // ejectorRateGroup.startPeriodic(0.2);
 
     super.teleopInit();
   }
@@ -172,6 +174,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    isEnabled = false;
     ejectorRateGroup.stop();
     collectorRateGroup.stop();
     liftRateGroup.stop();

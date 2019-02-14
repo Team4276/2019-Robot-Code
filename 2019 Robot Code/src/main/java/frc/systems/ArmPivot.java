@@ -22,10 +22,10 @@ public class ArmPivot extends Thread implements Runnable {
 	Encoder pivotEncoder;
 
 	// Constants
-	private final double CARGO_IN_SETPOINT = 0.0;
-	private final double DOWN_SETPOINT = -90.0;
+	public final double CARGO_IN_SETPOINT = 0.0;
+	public final double DOWN_SETPOINT = -90.0;
 
-	private final double UP_SETPOINT = 85.0;
+	public final double UP_SETPOINT = 80.0;
 
 	private final double BACKDRIVE_POWER = 0.3;
 
@@ -141,6 +141,8 @@ public class ArmPivot extends Thread implements Runnable {
 			commandedAngle = CARGO_IN_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.RB)) {
 			commandedAngle = UP_SETPOINT;
+		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LT) > 0.5) {
+			commandedAngle = DOWN_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) < -0.15) {
 			commandedAngle = commandedAngle + SETPOINT_INCREMENT;
 		} else if (Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) > 0.15) {

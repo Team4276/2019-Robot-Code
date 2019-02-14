@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
@@ -13,22 +14,23 @@ import frc.utilities.Xbox;
 
 public class BallLift {
 
-	Value lowPosition = DoubleSolenoid.Value.kForward;
-	Value highPosition = DoubleSolenoid.Value.kReverse;
-	double backPower = 1;
-	double frontPower = -1;
+	boolean lowPosition = false;
+	boolean highPosition = true;
+	double backPowerShoot = 1;
+	double backPowerSpit = .4;
+	double frontPower = -.7;
 	boolean goingHi = false;
 	boolean goingLo = false;
 	boolean goingOut = false;
 	boolean isCollecting = false;
 
 	VictorSPX backroller, frontroller;
-	DoubleSolenoid diverter;
+	Solenoid diverter;
 
-	public BallLift(int backPort, int frontPort, int divertA, int divertB) {
+	public BallLift(int backPort, int frontPort, int divertA) {
 		backroller = new VictorSPX(backPort);
 		frontroller = new VictorSPX(frontPort);
-		diverter = new DoubleSolenoid(divertA, divertB);
+		diverter = new Solenoid(divertA);
 		diverter.set(highPosition);
 	}
 
@@ -52,7 +54,7 @@ public class BallLift {
 
 		diverter.set(lowPosition);
 		frontroller.set(ControlMode.PercentOutput, frontPower);
-		backroller.set(ControlMode.PercentOutput, backPower);
+		backroller.set(ControlMode.PercentOutput, backPowerSpit);
 
 		goingHi = false;
 		goingLo = true;
@@ -64,7 +66,7 @@ public class BallLift {
 
 		diverter.set(highPosition);
 		frontroller.set(ControlMode.PercentOutput, frontPower);
-		backroller.set(ControlMode.PercentOutput, backPower);
+		backroller.set(ControlMode.PercentOutput, backPowerShoot);
 
 		goingHi = true;
 		goingLo = false;
@@ -75,7 +77,7 @@ public class BallLift {
 	public void reverse() {
 
 		frontroller.set(ControlMode.PercentOutput, -frontPower);
-		backroller.set(ControlMode.PercentOutput, -backPower);
+		backroller.set(ControlMode.PercentOutput, -backPowerShoot);
 
 		goingHi = false;
 		goingLo = false;
@@ -87,6 +89,14 @@ public class BallLift {
 
 		frontroller.set(ControlMode.PercentOutput, 0);
 		backroller.set(ControlMode.PercentOutput, 0);
+
+		goingHi = false;
+		goingLo = false;
+		goingOut = false;
+		isCollecting = false;
+	}
+	public void exStop() {
+
 
 		goingHi = false;
 		goingLo = false;

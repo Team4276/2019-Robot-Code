@@ -20,18 +20,18 @@ public class Collector {
         isCollecting = true;
     }
 
-    public void outtake() {
-        Robot.mBallLift.reverse();
-        isCollecting = true;
-    }
+    // public void outtake() {
+    // Robot.mBallLift.reverse();
+    // isCollecting = true;
+    // }
 
     public void stop() {
-        Robot.mBallLift.stop();
+        Robot.mBallLift.exStop();
         isCollecting = false;
     }
 
     public void performMainProcessing() {
-        if (Robot.xboxJoystick.getRawButton(Xbox.LB) || Robot.xboxJoystick.getRawAxis(Xbox.LT) > 0.5) {
+        if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
             intake();
         } else {
             stop();

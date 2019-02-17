@@ -90,7 +90,8 @@ public class Robot extends TimedRobot {
         RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD);
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, 5,
+        RoboRioPorts.INTAKE_LIM_SWITCH);
 
     mCollector = new Collector();
 
@@ -176,7 +177,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     isEnabled = false;
     ejectorRateGroup.stop();
-    collectorRateGroup.stop();
+    //collectorRateGroup.stop();
     liftRateGroup.stop();
     driveRateGroup.stop();
 

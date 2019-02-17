@@ -5,39 +5,44 @@ import edu.wpi.first.wpilibj.VictorSP;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.utilities.Xbox;
 
 public class BallLift {
 
-	boolean lowPosition = false;
-	boolean highPosition = true;
-	double backPowerShoot = 1;
+	Value lowPosition = Value.kForward;
+	Value highPosition = Value.kReverse;
+	double backPowerShoot = .5;
 	double backPowerSpit = .4;
 	double frontPower = -.7;
+	double collectPower = -.7;
 	boolean goingHi = false;
 	boolean goingLo = false;
 	boolean goingOut = false;
 	boolean isCollecting = false;
 
 	VictorSPX backroller, frontroller;
-	Solenoid diverter;
+	DigitalInput intakeSwitch;
+	DoubleSolenoid diverter;
 
-	public BallLift(int backPort, int frontPort, int divertA) {
+	public BallLift(int backPort, int frontPort, int divertA, int B, int limSwitch) {
+		intakeSwitch = new DigitalInput(limSwitch);
 		backroller = new VictorSPX(backPort);
 		frontroller = new VictorSPX(frontPort);
-		diverter = new Solenoid(divertA);
+		diverter = new DoubleSolenoid(divertA, B);
 		diverter.set(highPosition);
 	}
 
 	public void performMainProcessing() {
 
-		if (isCollecting) {
-			collect(frontPower);
+		if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
+			collect(collectPower);
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.A)) {
 			reverse();
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.B)) {
@@ -59,6 +64,7 @@ public class BallLift {
 		goingHi = false;
 		goingLo = true;
 		goingOut = false;
+		isCollecting = false;
 
 	}
 
@@ -71,7 +77,7 @@ public class BallLift {
 		goingHi = true;
 		goingLo = false;
 		goingOut = false;
-
+		isCollecting = false;
 	}
 
 	public void reverse() {
@@ -82,21 +88,24 @@ public class BallLift {
 		goingHi = false;
 		goingLo = false;
 		goingOut = true;
+		isCollecting = false;
 
 	}
 
 	public void stop() {
 
+		diverter.set(highPosition);
 		frontroller.set(ControlMode.PercentOutput, 0);
 		backroller.set(ControlMode.PercentOutput, 0);
+		Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.0);
 
 		goingHi = false;
 		goingLo = false;
 		goingOut = false;
 		isCollecting = false;
 	}
-	public void exStop() {
 
+	public void exStop() {
 
 		goingHi = false;
 		goingLo = false;
@@ -105,7 +114,16 @@ public class BallLift {
 	}
 
 	private void collect(double power) {
-		frontroller.set(ControlMode.PercentOutput, power);
+		isCollecting = true;
+		// diverter.set(highPosition);
+		if (intakeSwitch.get()) {
+			frontroller.set(ControlMode.PercentOutput, 0);
+			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5);
+		} else {
+			frontroller.set(ControlMode.PercentOutput, power);
+			backroller.set(ControlMode.PercentOutput, -power);
+			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.0);
+		}
 
 	}
 
@@ -117,6 +135,9 @@ public class BallLift {
 		SmartDashboard.putBoolean("High Goal:", goingHi);
 		SmartDashboard.putBoolean("Low Goal:", goingLo);
 		SmartDashboard.putBoolean("Outake:", goingOut);
+		SmartDashboard.putBoolean("Has Ball", intakeSwitch.get());
+
+		SmartDashboard.putBoolean("Collecting:", isCollecting);
 	}
 
 }

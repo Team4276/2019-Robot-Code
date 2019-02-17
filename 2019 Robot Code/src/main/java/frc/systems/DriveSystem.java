@@ -45,12 +45,15 @@ public class DriveSystem {
     SoftwareTimer driveTimer;
     private boolean shiftInit = true;
     private boolean isShifting = false;
-    private Gear currentGear;
+    private boolean isDeploying = false;
+    private Gear currentGear = Gear.HI;
 
     VictorSP flDrive, mlDrive, blDrive, frDrive, mrDrive, brDrive;
     VictorSPX flDriveX, mlDriveX, blDriveX, frDriveX, mrDriveX, brDriveX;
     private double leftPower = 0;
     private double rightPower = 0;
+    private double hatchDeployHiGear = -0.25;
+    private double hatchDeployLoGear = -0.5;
 
     private boolean methodInit = true;
     private Notifier m_follower_notifier;
@@ -121,23 +124,41 @@ public class DriveSystem {
      */
 
     public void operatorDrive() {
-        double leftY = 0;
-        double rightY = 0;
-
-        if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
-            leftY = -Math.pow(Robot.leftJoystick.getY(), 3);
-        }
-        if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-            rightY = Math.pow(Robot.rightJoystick.getY(), 3);
-        }
 
         checkForGearShift();
 
-        if (!isShifting) {
-            assignMotorPower(leftY, rightY);
-        } else {
+        if (Robot.leftJoystick.getRawButton(1)) {
+            isDeploying = true;
+            switch (currentGear) {
+            case HI:
+                assignMotorPower(hatchDeployHiGear, -hatchDeployHiGear);
+                break;
+            case LO:
+                assignMotorPower(hatchDeployLoGear, -hatchDeployLoGear);
+                break;
+            default:
+                break;
+            }
 
-            assignMotorPower(0, 0);
+        } else {
+            isDeploying = false;
+
+            double leftY = 0;
+            double rightY = 0;
+
+            if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
+                leftY = -Math.pow(Robot.leftJoystick.getY(), 3);
+            }
+            if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
+                rightY = Math.pow(Robot.rightJoystick.getY(), 3);
+            }
+
+            if (!isShifting) {
+                assignMotorPower(leftY, rightY);
+            } else {
+
+                assignMotorPower(0, 0);
+            }
         }
         updateTelemetry();
     }
@@ -258,8 +279,8 @@ public class DriveSystem {
 
         assignMotorPower(power + turn, power - turn);
 
-        if(driveTimer.isExpired()){
-            assignMotorPower(0,0);
+        if (driveTimer.isExpired()) {
+            assignMotorPower(0, 0);
             return true;
         }
         return false;
@@ -337,14 +358,14 @@ public class DriveSystem {
         }
     }
 
-   /*() public void reset(){
-        assignMotorPower(rightPow, leftPow);
-    }*/
+    /*
+     * () public void reset(){ assignMotorPower(rightPow, leftPow); }
+     */
     /**
      * updates smartdashboard
      */
     public void updateTelemetry() {
-        //SmartDashboard.putNumber("Heading", Robot.robotIMU.getYaw());
+        // SmartDashboard.putNumber("Heading", Robot.robotIMU.getYaw());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());
@@ -356,6 +377,8 @@ public class DriveSystem {
         // power outputs
         SmartDashboard.putNumber("Right Power", rightPower);
         SmartDashboard.putNumber("Left Power", leftPower);
+        // Deploy hatch
+        SmartDashboard.putBoolean("Hatch Back Up", isDeploying);
     }
 
 }

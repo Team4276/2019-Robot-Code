@@ -36,7 +36,6 @@ public class RoboRioPorts {
 
 	
 	public static final int DIVERTER_FWD = 4;
-	public static final int DIVERTER_REV = 5;
 
 	// *** DIO ***
 	// Example:

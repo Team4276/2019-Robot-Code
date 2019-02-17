@@ -40,7 +40,6 @@ public class Collector {
     }
 
     public void updateTelemetry() {
-        SmartDashboard.putBoolean("Collecting:", isCollecting);
 
     }
 

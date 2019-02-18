@@ -8,37 +8,31 @@
 package frc.systems.sensors;
 
 import com.analog.adis16448.frc.ADIS16448_IMU;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IMU {
 
-    ADIS16448_IMU imu;
+    ADXRS450_Gyro imu;
+
+    // ADIS16448_IMU imu;
 
     public IMU() {
-        imu = new ADIS16448_IMU();
+
+        imu = new ADXRS450_Gyro();
+        // imu = new ADIS16448_IMU();
         imu.reset();
         imu.calibrate();
     }
 
     public double getYaw() {
-        return imu.getYaw();
+        return imu.getAngle();
+        // return imu.getYaw();
     }
 
     public void giveReadouts() {
-        SmartDashboard.putNumber("Gyro-X", imu.getAngleX());
-        SmartDashboard.putNumber("Gyro-Y", imu.getAngleY());
-        SmartDashboard.putNumber("Gyro-Z", imu.getAngleZ());
+        SmartDashboard.putNumber("Yaw", imu.getAngle());
 
-        SmartDashboard.putNumber("Accel-X", imu.getAccelX());
-        SmartDashboard.putNumber("Accel-Y", imu.getAccelY());
-        SmartDashboard.putNumber("Accel-Z", imu.getAccelZ());
-
-        SmartDashboard.putNumber("Pitch", imu.getPitch());
-        SmartDashboard.putNumber("Roll", imu.getRoll());
-        SmartDashboard.putNumber("Yaw", imu.getYaw());
-
-        SmartDashboard.putNumber("Pressure: ", imu.getBarometricPressure());
-        SmartDashboard.putNumber("Temperature: ", imu.getTemperature());
     }
 }

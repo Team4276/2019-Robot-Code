@@ -70,9 +70,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     systemTimer = new Timer();
-    // mImu = new IMU();
-    // robotIMU = new ADIS16448_IMU();
-    // robotIMU.calibrate();
+     mImu = new IMU();
+    
 
     robotCameraSystem = new Cameras();
     visionInfoReceiver = new JReceiver();

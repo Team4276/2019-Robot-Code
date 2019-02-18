@@ -1,17 +1,35 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Hatch Back Up" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="730" y="191"/>
+		<width>176</width>
+	</widget>
+	<widget field="Shifting" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="730" y="174"/>
+		<width>145</width>
+	</widget>
+	<widget field="LOW Gear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="618" y="201"/>
+		<width>93</width>
+		<height>29</height>
+	</widget>
+	<widget field="HI Gear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="618" y="173"/>
+		<width>80</width>
+		<height>27</height>
+	</widget>
 	<widget field="Has Ball" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="1122" y="167"/>
 		<width>73</width>
 		<height>25</height>
 	</widget>
-	<widget field="Hatch Back Up" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="713" y="221"/>
-	</widget>
 	<widget field="Estimated Arm Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
 		<location x="942" y="62"/>
 		<width>184</width>
 		<height>96</height>
+		<property name="Upper Limit" value="95.0"/>
+		<property name="Lower Limit" value="-95.0"/>
+		<property name="Tick Interval" value="15.0"/>
 	</widget>
 	<widget field="Collecting:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="1133" y="61"/>
@@ -75,15 +93,6 @@
 	</widget>
 	<widget field="Right Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="436" y="642"/>
-	</widget>
-	<widget field="LOW Gear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="558" y="216"/>
-	</widget>
-	<widget field="HI Gear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="566" y="190"/>
-	</widget>
-	<widget field="Shifting" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="727" y="194"/>
 	</widget>
 	<widget field="Left Encoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="513" y="493"/>

@@ -281,6 +281,49 @@ public class DriveSystem {
 
         if (driveTimer.isExpired()) {
             assignMotorPower(0, 0);
+            methodInit = true;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean rotate(double targetTime, double desired_heading) {
+
+        if (methodInit) {
+            driveTimer.setTimer(targetTime);
+            methodInit = false;
+        }
+        double P_turn = Constants.regDrivePIDs[Constants.P];
+        double heading_difference = desired_heading - Robot.mImu.getYaw();
+        double turn = P_turn * heading_difference;
+
+        assignMotorPower(turn, -turn);
+
+        if (driveTimer.isExpired()) {
+            assignMotorPower(0, 0);
+            methodInit = true;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean rotate(double targetTime, int targetPixel) {
+        double desired_heading = 0;
+        double degppixel = 170/640;//tentative
+        if (methodInit) {
+            desired_heading = Robot.mImu.getYaw() + (targetPixel *degppixel);
+            driveTimer.setTimer(targetTime);
+            methodInit = false;
+        }
+        double P_turn = Constants.regDrivePIDs[Constants.P];
+        double heading_difference = desired_heading - Robot.mImu.getYaw();
+        double turn = P_turn * heading_difference;
+
+        assignMotorPower(turn, -turn);
+
+        if (driveTimer.isExpired()) {
+            assignMotorPower(0, 0);
+            methodInit = true;
             return true;
         }
         return false;
@@ -365,7 +408,7 @@ public class DriveSystem {
      * updates smartdashboard
      */
     public void updateTelemetry() {
-        // SmartDashboard.putNumber("Heading", Robot.robotIMU.getYaw());
+        SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());

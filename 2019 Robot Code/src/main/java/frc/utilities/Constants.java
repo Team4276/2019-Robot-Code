@@ -27,7 +27,7 @@ public class Constants {
     public final static Value HI_GEAR_VALUE = DoubleSolenoid.Value.kForward;
     public final static Value LO_GEAR_VALUE = DoubleSolenoid.Value.kReverse;
 
-    public final static double[] regDrivePIDs = { 0, 0.0, 0.0, 0.0 }; // F = 0, P = 0, I = 0, D = 0
+    public final static double[] regDrivePIDs = { 0, 0.02, 0.0, 0.0 }; // F = 0, P = 0, I = 0, D = 0
 
     /**
      * Set to zero to skip waiting for confirmation. Set to nonzero to wait and

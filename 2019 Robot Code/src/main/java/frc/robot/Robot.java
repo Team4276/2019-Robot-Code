@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
     visionTargetInfo = new JTargetInfo();
     nSequenceVisionSystem = 0;
     visionThread = new Thread(new JVisionSystemReceiverRunnable());
-    // visionThread.start();
+     visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
@@ -140,7 +140,7 @@ public class Robot extends TimedRobot {
     String error = "false";
     try {
       SmartDashboard.putString("AUTO ERROR:", error);
-      mDriveSystem.drivePath("MidToFrontLeft");
+      mDriveSystem.rotate(1.5, 90);
     } catch (Exception e) {
       error = e.getMessage();
       SmartDashboard.putString("AUTO ERROR:", error);

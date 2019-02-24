@@ -116,14 +116,15 @@ public class BallLift {
 	private void collect(double power) {
 		isCollecting = true;
 		// diverter.set(highPosition);
-		if (intakeSwitch.get()) {
+	/*	if (intakeSwitch.get()) {
 			frontroller.set(ControlMode.PercentOutput, 0);
 			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5);
 		} else {
+			*/
 			frontroller.set(ControlMode.PercentOutput, power);
 			backroller.set(ControlMode.PercentOutput, power);
 			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.0);
-		}
+		//}
 
 	}
 

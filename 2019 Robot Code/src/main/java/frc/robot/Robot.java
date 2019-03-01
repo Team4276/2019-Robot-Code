@@ -20,6 +20,7 @@ import frc.utilities.RoboRioPorts;
 import frc.autonomous.DashboardInterface;
 import frc.systems.ArmPivot;
 import frc.systems.BallLift;
+import frc.systems.ClimbingJack;
 import frc.systems.Collector;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -63,6 +64,9 @@ public class Robot extends TimedRobot {
   Notifier armRateGroup;
   public static ArmPivot mArmPivot;
 
+  Notifier climberRateGroup;
+  public static ClimbingJack mClimbingJack;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -70,15 +74,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     systemTimer = new Timer();
-     mImu = new IMU();
-    
+    mImu = new IMU();
 
     robotCameraSystem = new Cameras();
     visionInfoReceiver = new JReceiver();
     visionTargetInfo = new JTargetInfo();
     nSequenceVisionSystem = 0;
     visionThread = new Thread(new JVisionSystemReceiverRunnable());
-     visionThread.start();
+    visionThread.start();
 
     leftJoystick = new Joystick(0);
     rightJoystick = new Joystick(1);
@@ -89,15 +92,17 @@ public class Robot extends TimedRobot {
         RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV,
-        RoboRioPorts.INTAKE_LIM_SWITCH);
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD,
+        RoboRioPorts.DIVERTER_REV, RoboRioPorts.INTAKE_LIM_SWITCH);
 
     mCollector = new Collector();
 
-    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD,RoboRioPorts.EJECTOR_PISTON_REV);
+    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD, RoboRioPorts.EJECTOR_PISTON_REV);
 
     mArmPivot = new ArmPivot(RoboRioPorts.CAN_ARM_PIVOT1, RoboRioPorts.DIO_ARM_A, RoboRioPorts.DIO_ARM_B,
         RoboRioPorts.ARM_LIM_SWITCH);
+
+    mClimbingJack = new ClimbingJack(RoboRioPorts.JACK_FWD, RoboRioPorts.JACK_REV);
 
     driveRateGroup = new Notifier(mDriveSystem::operatorDrive);
     liftRateGroup = new Notifier(mBallLift::performMainProcessing);
@@ -110,6 +115,7 @@ public class Robot extends TimedRobot {
     liftRateGroup.startPeriodic(0.1);
     collectorRateGroup.startPeriodic(0.1);
     ejectorRateGroup.startPeriodic(0.1);
+    climberRateGroup.startPeriodic(0.1);
   }
 
   /**
@@ -139,7 +145,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    
+
+    robotCameraSystem.mainCamera.setExposureHoldCurrent();
   }
 
   /**
@@ -156,7 +163,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     isEnabled = true;
 
-		//robotCameraSystem.mainCamera.setExposureHoldCurrent();
+    robotCameraSystem.mainCamera.setExposureHoldCurrent();
 
     super.teleopInit();
   }
@@ -167,7 +174,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     isEnabled = false;
-
 
     super.disabledInit();
   }

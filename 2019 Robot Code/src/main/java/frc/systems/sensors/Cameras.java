@@ -22,6 +22,9 @@ public class Cameras {
 		mainCamera.setResolution(MAIN_RES_X, MAIN_RES_Y);
 		mainCamera.setFPS(MAIN_FPS);
 		mainCamera.setExposureAuto();
+		//mainCamera.setExposureManual(60);
+		
+		
 	}
 
 }

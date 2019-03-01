@@ -1,5 +1,9 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="video mode" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="541"/>
+		<width>467</width>
+	</widget>
 	<widget field="Pivoter override" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="1142" y="171"/>
 		<width>99</width>
@@ -106,7 +110,7 @@
 		<height>26</height>
 	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="247" y="207"/>
+		<location x="300" y="383"/>
 		<width>179</width>
 		<height>143</height>
 		<property name="Image File" value="C:\Users\eric\workspace\2019-Robot-Code\Dashboard\PNGPIX-COM-Crosshair-PNG-Transparent-Image-1-500x500.png"/>
@@ -132,5 +136,55 @@
 	</static-widget>
 </dashboard>
 <live-window>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="Encoder[1]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="16"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,2]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="113"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,0]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="133"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="ADXRS450_Gyro[0]" type="Gyro" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
+			<location x="6" y="153"/>
+			<height>150</height>
+			<width>250</width>
+		</widget>
+		<widget field="Encoder[2]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="303"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[6]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="400"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[7]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="420"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,4]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="440"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="Encoder[0]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="460"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<location x="3" y="10"/>
+		<width>262</width>
+		<height>563</height>
+	</widget>
 </live-window>
 </xml>

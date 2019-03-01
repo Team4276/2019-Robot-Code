@@ -89,12 +89,12 @@ public class Robot extends TimedRobot {
         RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.DIO_DRIVE_RIGHT_A,
         RoboRioPorts.DIO_DRIVE_RIGHT_B, RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B);
 
-    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, 5,
+    mBallLift = new BallLift(RoboRioPorts.CAN_LIFT_BACK, RoboRioPorts.CAN_LIFT_FRONT, RoboRioPorts.DIVERTER_FWD, RoboRioPorts.DIVERTER_REV,
         RoboRioPorts.INTAKE_LIM_SWITCH);
 
     mCollector = new Collector();
 
-    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD);
+    mEjector = new Ejector(RoboRioPorts.EJECTOR_PISTON_FWD,RoboRioPorts.EJECTOR_PISTON_REV);
 
     mArmPivot = new ArmPivot(RoboRioPorts.CAN_ARM_PIVOT1, RoboRioPorts.DIO_ARM_A, RoboRioPorts.DIO_ARM_B,
         RoboRioPorts.ARM_LIM_SWITCH);
@@ -106,6 +106,10 @@ public class Robot extends TimedRobot {
     armRateGroup = new Notifier(mArmPivot::performMainProcessing);
 
     armRateGroup.startPeriodic(.025);
+    driveRateGroup.startPeriodic(0.05);
+    liftRateGroup.startPeriodic(0.1);
+    collectorRateGroup.startPeriodic(0.1);
+    ejectorRateGroup.startPeriodic(0.1);
   }
 
   /**
@@ -119,7 +123,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
   }
 
   /**
@@ -136,16 +139,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    isEnabled = true;
-    String error = "false";
-    try {
-      SmartDashboard.putString("AUTO ERROR:", error);
-      mDriveSystem.rotate(1.5, 90);
-    } catch (Exception e) {
-      error = e.getMessage();
-      SmartDashboard.putString("AUTO ERROR:", error);
-      // TODO: handle exception
-    }
+    
   }
 
   /**
@@ -161,10 +155,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     isEnabled = true;
-    driveRateGroup.startPeriodic(0.05);
-    liftRateGroup.startPeriodic(0.1);
-    collectorRateGroup.startPeriodic(0.1);
-    // ejectorRateGroup.startPeriodic(0.2);
+
+		//robotCameraSystem.mainCamera.setExposureHoldCurrent();
 
     super.teleopInit();
   }
@@ -175,10 +167,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     isEnabled = false;
-    ejectorRateGroup.stop();
-    //collectorRateGroup.stop();
-    liftRateGroup.stop();
-    driveRateGroup.stop();
+
 
     super.disabledInit();
   }

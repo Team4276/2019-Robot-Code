@@ -1,34 +1,29 @@
 package frc.systems;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.utilities.Xbox;
-import frc.utilities.SoftwareTimer;
 
 public class Ejector {
-    private Solenoid ejectSol;
-    private SoftwareTimer ejectTime;
+    private DoubleSolenoid ejectSol;
     double activateTime = 0.25;
     boolean isEjecting = false;
+    private final Value kApart = DoubleSolenoid.Value.kReverse;
+    private final Value kTogether = DoubleSolenoid.Value.kForward;
 
-    public Ejector(int port1) {
-        ejectSol = new Solenoid(port1);
-        ejectTime = new SoftwareTimer();
+    public Ejector(int port1, int port2) {
+        ejectSol = new DoubleSolenoid(port1, port2);
     }
 
     public void performMainProcessing() {
-        if (Math.abs(Robot.xboxJoystick.getRawAxis(Xbox.RT)) > .2) {
+        if (Math.abs(Robot.xboxJoystick.getRawAxis(Xbox.RT)) > 0.2) {
+            Robot.xboxJoystick.setRumble(RumbleType.kRightRumble, 0.3);
             eject();
-            if (!Robot.mArmPivot.backDrive(true)) {
-                Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5);
-            } else {
-                Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0);
-            }
         } else {
-            Robot.mArmPivot.backDrive(false);
-            Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0);
+            Robot.xboxJoystick.setRumble(RumbleType.kRightRumble, 0.0);
             unject();
         }
         updateTelemetry();
@@ -36,22 +31,15 @@ public class Ejector {
 
     public void eject() {
         isEjecting = true;
-        ejectSol.set(true);
+        ejectSol.set(kTogether);
         // ejectTime.setTimer(activateTime);
 
     }
 
     public void unject() {
         isEjecting = false;
-        ejectSol.set(false);
+        ejectSol.set(kApart);
 
-    }
-
-    public void checkForUnject() {
-        if (ejectTime.isExpired()) {
-            ejectSol.set(false);
-            isEjecting = false;
-        }
     }
 
     public void updateTelemetry() {

@@ -35,8 +35,8 @@ public class RoboRioPorts {
 	public static final int DIVERTER_FWD = 4;
 	public static final int DIVERTER_REV = 5;
 
-	public static final int JACK_FWD = 4;
-	public static final int JACK_REV = 5;
+	public static final int JACK_FWD = 6;
+	public static final int JACK_REV = 7;
 
 	// *** DIO ***
 	// Example:

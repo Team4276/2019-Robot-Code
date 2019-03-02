@@ -109,6 +109,7 @@ public class Robot extends TimedRobot {
     collectorRateGroup = new Notifier(mCollector::performMainProcessing);
     ejectorRateGroup = new Notifier(mEjector::performMainProcessing);
     armRateGroup = new Notifier(mArmPivot::performMainProcessing);
+    climberRateGroup = new Notifier(mClimbingJack::performMainProcessing);
 
     armRateGroup.startPeriodic(.025);
     driveRateGroup.startPeriodic(0.05);
@@ -188,6 +189,7 @@ public class Robot extends TimedRobot {
     mBallLift.updateTelemetry();
     mCollector.updateTelemetry();
     mEjector.updateTelemetry();
+    mClimbingJack.updateTelemetry();
 
     super.disabledPeriodic();
   }

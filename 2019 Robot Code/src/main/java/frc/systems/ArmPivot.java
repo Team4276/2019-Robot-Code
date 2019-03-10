@@ -25,7 +25,7 @@ public class ArmPivot extends Thread implements Runnable {
 	public final double CARGO_IN_SETPOINT = 0.0;
 	public final double DOWN_SETPOINT = -90.0;
 
-	public final double UP_SETPOINT = 80.0;
+	public final double UP_SETPOINT = 20.0;
 
 	private final double BACKDRIVE_POWER = 0.3;
 
@@ -36,7 +36,7 @@ public class ArmPivot extends Thread implements Runnable {
 	private final double STARTING_ANGLE = DOWN_SETPOINT;
 	private final double SETPOINT_INCREMENT = 5; // deg
 	private final double MAX_POWER = 0.8;
-	private final double UPPER_LIMIT = 85;
+	private final double UPPER_LIMIT = 20;
 	private final double LOWER_LIMIT = -90;
 	private final double DEGREES_PER_PULSE = (-0.2036244521);
 	private final double ANGLE_THRESHOLD = 90; // deg

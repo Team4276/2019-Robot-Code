@@ -42,12 +42,12 @@ public class JTargetInfo {
 	public static final int streamSourcePortOnRaspberryPi = 1185;  
 	public static final int streamAnnotatedSourcePortOnRaspberryPi = 1186;  
 
-	public Boolean isCargoBayDetected;
+	public int isCargoBayDetected;  // 0 == false
 	public double visionPixelX;
 	
 	public int nSequence;
-	public int timeSinceLastCameraFrameMilliseconds;
-	public int timeLatencyThisCameraFrameMilliseconds;
+	public long timeSinceLastCameraFrameMilliseconds;
+	public long timeLatencyThisCameraFrameMilliseconds;
 
 	int commaPos;
 	String word;
@@ -60,7 +60,7 @@ public class JTargetInfo {
 	}
 
 	public void init() {
-		isCargoBayDetected = false;
+		isCargoBayDetected = 0;
 		visionPixelX = 0.0;
 		timeSinceLastCameraFrameMilliseconds = 0;
 		timeLatencyThisCameraFrameMilliseconds = 0;
@@ -85,7 +85,7 @@ public class JTargetInfo {
 			}
 		}
 		int idx = 0;
-		isCargoBayDetected = (items.get(idx++) == "true");
+		isCargoBayDetected = Integer.parseInt(items.get(idx++));
 		visionPixelX = Double.parseDouble(items.get(idx++));
 		nSequence = Integer.parseInt(items.get(idx++));
 		timeSinceLastCameraFrameMilliseconds = Integer.parseInt(items.get(idx++));
@@ -93,21 +93,18 @@ public class JTargetInfo {
 	}
 
 	public String numberToText() {
-		String s = "false,";
-		if (isCargoBayDetected) {
-			s = "true,";
-		}
+		s += Integer.toString(isCargoBayDetected) + ",";
 		s += Double.toString(visionPixelX) + ",";
 		s += Integer.toString(nSequence) + ",";
-		s += Integer.toString(timeSinceLastCameraFrameMilliseconds) + ",";
-		s += Integer.toString(timeLatencyThisCameraFrameMilliseconds) + ",";
+		s += Long.toString(timeSinceLastCameraFrameMilliseconds) + ",";
+		s += Long.toString(timeLatencyThisCameraFrameMilliseconds) + ",";
 		return s;
 	}
 
 	public String displayText() {
 		String str = "Seq: " + nSequence + "  Time Since Last Frame: " + timeSinceLastCameraFrameMilliseconds + "ms.\n";
 		str += "Latency This Frame: " + timeSinceLastCameraFrameMilliseconds + "ms.\n";
-		if (isCargoBayDetected) {
+		if (isCargoBayDetected != 0) {
 			str += "X Pixel: " + visionPixelX + "\n";
 		} else {
 			str += "No Cargo Bay Detected\n";

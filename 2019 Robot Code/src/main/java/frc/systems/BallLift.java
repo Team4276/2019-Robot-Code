@@ -2,6 +2,7 @@ package frc.systems;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
+import com.ctre.phoenix.CANifier.LEDChannel;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
+import frc.systems.LEDControl.LightMode;
 import frc.utilities.Xbox;
 
 public class BallLift {
@@ -43,14 +45,19 @@ public class BallLift {
 
 		if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
 			collect(collectPower);
+			//Robot.mLED.setMode(LightMode.INTAKE);
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.A)) {
 			reverse();
+			//Robot.mLED.setMode(LightMode.ENABLE);
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.B)) {
 			lowScore();
+			//Robot.mLED.setMode(LightMode.SHOOT);
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.Y)) {
 			highScore();
+			//Robot.mLED.setMode(LightMode.SHOOT);
 		} else {
 			stop();
+			//Robot.mLED.setMode(LightMode.ENABLE);
 		}
 		updateTelemetry();
 	}
@@ -116,15 +123,14 @@ public class BallLift {
 	private void collect(double power) {
 		isCollecting = true;
 		// diverter.set(highPosition);
-	/*	if (intakeSwitch.get()) {
-			frontroller.set(ControlMode.PercentOutput, 0);
-			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5);
-		} else {
-			*/
-			frontroller.set(ControlMode.PercentOutput, power);
-			backroller.set(ControlMode.PercentOutput, power);
-			Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.0);
-		//}
+		/*
+		 * if (intakeSwitch.get()) { frontroller.set(ControlMode.PercentOutput, 0);
+		 * Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.5); } else {
+		 */
+		frontroller.set(ControlMode.PercentOutput, power);
+		backroller.set(ControlMode.PercentOutput, power);
+		Robot.xboxJoystick.setRumble(RumbleType.kLeftRumble, 0.0);
+		// }
 
 	}
 

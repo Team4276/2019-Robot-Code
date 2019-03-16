@@ -1,13 +1,16 @@
 <xml version="1.0">
 <dashboard>
-<<<<<<< HEAD
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="-219" y="31"/>
-		<width>742</width>
-		<height>206</height>
-		<property name="Image File" value="C:\Users\User\Documents\Avery's stuff\Robotics\2019 Workspace\2019-Robot-Code\Dashboard\green line.png"/>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="2" y="3"/>
+		<width>572</width>
+		<height>488</height>
+		<property name="Camera Choice" value=""/>
+		<property name="Selected Camera Path" value="10.42.76.11"/>
 	</static-widget>
-=======
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.MjpgStreamViewerImpl">
+		<location x="614" y="48"/>
+		<property name="MJPG Server URL" value="10.42.76.11"/>
+	</static-widget>
 	<widget field="climbinit" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="604"/>
 	</widget>
@@ -25,7 +28,6 @@
 		<location x="1142" y="171"/>
 		<width>99</width>
 	</widget>
->>>>>>> cbe94dd0405bed9f865c0d00667372870823af54
 	<widget field="Hatch Back Up" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="836" y="294"/>
 		<width>176</width>
@@ -140,122 +142,7 @@
 	<widget field="UP" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="7" y="699"/>
 	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
-		<location x="7" y="0"/>
-		<width>645</width>
-		<height>540</height>
-		<property name="Camera Choice" value=""/>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.Image">
-		<location x="1" y="-5"/>
-		<width>1599</width>
-		<height>809</height>
-		<property name="Image File" value="C:\Users\eric\workspace\2019-Robot-Code\Dashboard\SDB Background.png"/>
-	</static-widget>
 </dashboard>
 <live-window>
-<<<<<<< HEAD
-=======
-	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
-		<widget field="Encoder[1]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Encoder[1]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,2]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,2]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="ADXRS450_Gyro[0]" type="Table" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="ADXRS450_Gyro[0]" type="Table" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Encoder[2]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Encoder[2]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DigitalInput[6]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DigitalInput[6]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DigitalInput[7]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DigitalInput[7]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,4]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,4]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Encoder[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="Encoder[0]" type="Table" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
-			<location x="0" y="0"/>
-			<height>0</height>
-			<width>0</width>
-		</widget>
-		<widget field="DoubleSolenoid[0,6]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
-			<location x="6" y="16"/>
-			<height>20</height>
-			<width>178</width>
-		</widget>
-		<location x="3" y="10"/>
-		<width>190</width>
-		<height>42</height>
-	</widget>
->>>>>>> cbe94dd0405bed9f865c0d00667372870823af54
 </live-window>
 </xml>

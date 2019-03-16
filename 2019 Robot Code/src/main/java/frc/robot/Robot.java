@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import frc.systems.DriveSystem;
 import frc.systems.Ejector;
+import frc.systems.LEDControl;
 import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
 import frc.systems.sensors.ADIS16448_IMU;
@@ -67,6 +68,8 @@ public class Robot extends TimedRobot {
   Notifier climberRateGroup;
   public static ClimbingJack mClimbingJack;
 
+  //public static LEDControl mLED;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -75,6 +78,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     systemTimer = new Timer();
     mImu = new IMU();
+    //mLED = new LEDControl(0,0,0,0);
 
     robotCameraSystem = new Cameras();
     visionInfoReceiver = new JReceiver();
@@ -130,6 +134,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    //mLED.performMainProcessing();
+    SmartDashboard.putNumber("X Pixel", visionTargetInfo.visionPixelX);
+    SmartDashboard.putBoolean("Target Acquired", visionTargetInfo.isCargoBayDetected);
   }
 
   /**
@@ -155,6 +162,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    mDriveSystem.rotate(4, 45.0);
   }
 
   /**

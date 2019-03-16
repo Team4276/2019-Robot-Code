@@ -47,6 +47,7 @@ public class DriveSystem {
     private boolean isShifting = false;
     private boolean isDeploying = false;
     private Gear currentGear = Gear.HI;
+    private DriveMode currentMode = DriveMode.ARCADE;
 
     VictorSP flDrive, mlDrive, blDrive, frDrive, mrDrive, brDrive;
     VictorSPX flDriveX, mlDriveX, blDriveX, frDriveX, mrDriveX, brDriveX;
@@ -127,39 +128,51 @@ public class DriveSystem {
 
         checkForGearShift();
 
-        if (Robot.leftJoystick.getRawButton(1)) {
-            isDeploying = true;
-            switch (currentGear) {
-            case HI:
-                assignMotorPower(hatchDeployHiGear, -hatchDeployHiGear);
-                break;
-            case LO:
-                assignMotorPower(hatchDeployLoGear, -hatchDeployLoGear);
-                break;
-            default:
-                break;
+        isDeploying = false;
+
+        double leftY = 0;
+        double rightY = 0;
+
+        switch (currentMode) {
+        case ARCADE:
+
+            double linear = 0;
+            double turn = 0;
+
+            if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
+                linear = -Robot.rightJoystick.getY();
+            }
+            if (Math.abs(Robot.leftJoystick.getX()) > deadband) {
+                turn = Math.pow(Robot.leftJoystick.getX(), 3);
             }
 
-        } else {
-            isDeploying = false;
+            leftY = -linear - turn;
+            rightY = linear - turn;
 
-            double leftY = 0;
-            double rightY = 0;
+            break;
+
+        case TANK:
 
             if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
                 leftY = -Math.pow(Robot.leftJoystick.getY(), 3);
             }
             if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-                rightY = Math.pow(Robot.rightJoystick.getY(), 3);
+                rightY = Math.pow(Robot.rightJoystick.getY(), 3 / 2);
             }
 
-            if (!isShifting) {
-                assignMotorPower(leftY, rightY);
-            } else {
+            break;
 
-                assignMotorPower(0, 0);
-            }
+        default:
+            break;
         }
+
+        if (!isShifting) {
+            assignMotorPower(rightY, leftY);
+        } else {
+
+            assignMotorPower(0, 0);
+        }
+
         updateTelemetry();
     }
 
@@ -209,6 +222,10 @@ public class DriveSystem {
 
     public enum Gear {
         HI, LO
+    }
+
+    public enum DriveMode {
+        TANK, ARCADE
     }
 
     /**
@@ -297,7 +314,9 @@ public class DriveSystem {
         double heading_difference = desired_heading - Robot.mImu.getYaw();
         double turn = P_turn * heading_difference;
 
-        assignMotorPower(turn, -turn);
+        assignMotorPower(-turn, -turn);
+        SmartDashboard.putNumber("Turn", turn);
+        SmartDashboard.putNumber("diff", heading_difference);
 
         if (driveTimer.isExpired()) {
             assignMotorPower(0, 0);
@@ -307,11 +326,11 @@ public class DriveSystem {
         return false;
     }
 
-    public boolean rotate(double targetTime, int targetPixel) {
+    public boolean rotateCam(double targetTime, double targetPixel) {
         double desired_heading = 0;
-        double degppixel = 170/640;//tentative
+        double degppixel = 170 / 640;// tentative
         if (methodInit) {
-            desired_heading = Robot.mImu.getYaw() + (targetPixel *degppixel);
+            desired_heading = Robot.mImu.getYaw() + ((targetPixel - 320) * degppixel);
             driveTimer.setTimer(targetTime);
             methodInit = false;
         }

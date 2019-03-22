@@ -27,6 +27,8 @@ public class ClimbingJack {
     boolean isClimbing = false;
     boolean isJacked = false;
 
+    boolean elsewhereCommanded = false;
+
     public ClimbingJack(int jackA, int jackB) {
         jackSolenoid = new DoubleSolenoid(jackA, jackB);
         climbTimer = new SoftwareTimer();
@@ -40,25 +42,37 @@ public class ClimbingJack {
             isClimbing = true;
 
             jackSolenoid.set(kLift);
-           /* if (climbInit) {
-                climbTimer.setTimer(pistonDelay);
-                climbInit = false;
-            }*/
+            /*
+             * if (climbInit) { climbTimer.setTimer(pistonDelay); climbInit = false; }
+             */
             SmartDashboard.putBoolean("climbinit", climbInit);
             if ((Robot.xboxJoystick.getRawButton(Xbox.RAxis))) {
                 isJacked = true;
                 Robot.mArmPivot.commandSetpoint(-90);
-            } else {
+            } else  {
                 isJacked = false;
             }
 
-        } else {
+        } else if (!elsewhereCommanded){
             climbInit = true;
             isClimbing = false;
             isJacked = false;
             jackSolenoid.set(kRetract);
         }
         updateTelemetry();
+    }
+
+    public void setJack(boolean extend) {
+        if (extend) {
+            elsewhereCommanded = true;
+            jackSolenoid.set(kLift);
+            isJacked = true;
+        } else {
+            elsewhereCommanded = false;
+            jackSolenoid.set(kRetract);
+            isJacked = false;
+        }
+
     }
 
     public void updateTelemetry() {

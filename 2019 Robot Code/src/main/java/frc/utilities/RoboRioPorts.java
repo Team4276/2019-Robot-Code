@@ -58,7 +58,7 @@ public class RoboRioPorts {
 	public static final int ENABLE_PIN = 0;
 	public static final int INTAKE_PIN = 1;
 	public static final int BALL_PIN = 2;
-	public static final int CLIMB_PIN = 3;
+	public static final int SHOOT_PIN = 3;
 	
 
 }

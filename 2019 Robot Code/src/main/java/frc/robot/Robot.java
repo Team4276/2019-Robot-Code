@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
   Notifier climberRateGroup;
   public static ClimbingJack mClimbingJack;
 
-  //public static LEDControl mLED;
+  public static LEDControl mLED;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     systemTimer = new Timer();
     mImu = new IMU();
-    //mLED = new LEDControl(0,0,0,0);
+    mLED = new LEDControl(RoboRioPorts.ENABLE_PIN, RoboRioPorts.INTAKE_PIN, RoboRioPorts.BALL_PIN, RoboRioPorts.SHOOT_PIN);
 
     robotCameraSystem = new Cameras();
     visionInfoReceiver = new JReceiver();
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    //mLED.performMainProcessing();
+    mLED.performMainProcessing();
     SmartDashboard.putNumber("X Pixel", visionTargetInfo.visionPixelX);
     SmartDashboard.putBoolean("Target Acquired", (visionTargetInfo.isCargoBayDetected != 0));
   }

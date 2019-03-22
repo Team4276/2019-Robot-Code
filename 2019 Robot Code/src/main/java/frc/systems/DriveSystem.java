@@ -51,7 +51,7 @@ public class DriveSystem {
     private boolean isShifting = false;
     private boolean isDeploying = false;
     private Gear currentGear = Gear.HI;
-    private boolean brakeModeisEngaged;
+    private boolean brakeModeisEngaged = false;
     private final DriveMode DEFAULT_MODE = DriveMode.ARCADE;
     private DriveMode currentMode = DEFAULT_MODE;
     private String currentMode_s = "Arcade";
@@ -62,6 +62,10 @@ public class DriveSystem {
     private double rightPower = 0;
     private double hatchDeployHiGear = -0.25;
     private double hatchDeployLoGear = -0.5;
+    private double climbDelayTime = 1;// seconds
+    private double retractDelayTime = 3;// seconds
+    private double climbPower = .1;// seconds
+    private int timerNum = 1;
     double desired_heading = 0;
     int count = 0;
     private Toggler modeToggler;
@@ -171,8 +175,14 @@ public class DriveSystem {
 
             break;
 
+        case CLIMB:
+
+            climb();
+
+            break;
+
         case ARCADE:
-            methodInit = true;
+            resetAuto();
             double linear = 0;
             double turn = 0;
 
@@ -196,7 +206,7 @@ public class DriveSystem {
 
         case TANK:
 
-            methodInit = true;
+            resetAuto();
             if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
                 rightY = -Math.pow(Robot.leftJoystick.getY(), 3 / 2);
             }
@@ -267,7 +277,7 @@ public class DriveSystem {
     }
 
     public enum DriveMode {
-        TANK, ARCADE, AUTO
+        TANK, ARCADE, AUTO, CLIMB
     }
 
     /**
@@ -365,6 +375,38 @@ public class DriveSystem {
             return true;
         }
         return false;
+    }
+
+    public boolean climb() {
+
+        if (methodInit) {
+            driveTimer.setTimer(climbDelayTime);
+            methodInit = false;
+            timerNum = 1;
+            Robot.mArmPivot.commandSetpoint(-90);
+        }
+
+        if (driveTimer.isExpired()) {
+            if (timerNum == 1) {
+                Robot.mClimbingJack.setJack(true);
+                timerNum++;
+                driveTimer.setTimer(retractDelayTime);
+            } else if (timerNum == 2) {
+                Robot.mClimbingJack.setJack(false);
+                timerNum++;
+            } else {
+                assignMotorPower(0, 0);
+                return true;
+            }
+        }
+
+        assignMotorPower(-climbPower, climbPower);
+        return false;
+    }
+
+    public void resetAuto() {
+        methodInit = true;
+        timerNum = 1;
     }
 
     public boolean rotate(double targetTime, double desired_heading) {

@@ -36,7 +36,7 @@ public class JVisionSystemReceiverRunnable implements Runnable
             }
             else
             {
-                Robot.visionTargetInfo.isCargoBayDetected = false;
+                Robot.visionTargetInfo.isCargoBayDetected = 0;
             }
         }
     }

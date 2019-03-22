@@ -137,7 +137,7 @@ public class ArmPivot extends Thread implements Runnable {
 
 	private void determineSetpoint() {
 		// Determine commanded angle
-		if (Robot.xboxJoystick.getRawButton(Xbox.LB) || Robot.leftJoystick.getRawButton(1)) {
+		if (Robot.xboxJoystick.getRawButton(Xbox.LB)) {
 			commandedAngle = CARGO_IN_SETPOINT;
 		} else if (Robot.xboxJoystick.getRawButton(Xbox.RB)) {
 			commandedAngle = UP_SETPOINT;

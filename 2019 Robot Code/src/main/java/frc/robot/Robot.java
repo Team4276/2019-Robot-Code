@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     //mLED.performMainProcessing();
     SmartDashboard.putNumber("X Pixel", visionTargetInfo.visionPixelX);
-    SmartDashboard.putBoolean("Target Acquired", visionTargetInfo.isCargoBayDetected);
+    SmartDashboard.putBoolean("Target Acquired", (visionTargetInfo.isCargoBayDetected != 0));
   }
 
   /**
@@ -155,6 +155,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
 
     robotCameraSystem.mainCamera.setExposureHoldCurrent();
+    mDriveSystem.methodInit = true;
   }
 
   /**
@@ -162,7 +163,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    mDriveSystem.rotate(4, 45.0);
+    //mDriveSystem.rotateCam(4, visionTargetInfo.visionPixelX);
+    
   }
 
   /**

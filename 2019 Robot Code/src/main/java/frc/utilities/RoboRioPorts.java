@@ -52,7 +52,13 @@ public class RoboRioPorts {
 	public static final int DIO_ARM_B = 5;
 
 	public static final int INTAKE_LIM_SWITCH = 6;
-
+ 
 	public static final int ARM_LIM_SWITCH = 7;
+
+	public static final int ENABLE_PIN = 0;
+	public static final int INTAKE_PIN = 1;
+	public static final int BALL_PIN = 2;
+	public static final int CLIMB_PIN = 3;
+	
 
 }

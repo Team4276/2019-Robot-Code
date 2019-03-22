@@ -7,25 +7,27 @@
 
 package frc.systems;
 
-import edu.wpi.first.wpilibj.DigitalOutput;
-
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
 /**
  * Add your docs here.
  */
 public class LEDControl {
 
-    DigitalOutput enablePin;
-    DigitalOutput intakePin;
-    DigitalOutput ballPin;
-    DigitalOutput shootingPin;
+    Relay enablePin;
+    Relay intakePin;
+    Relay ballPin;
+    Relay shootingPin;
     private static LightMode currentMode = LightMode.DISABLE;
+    Value kFalse = Relay.Value.kOff;
+    Value kTrue = Relay.Value.kForward;
 
     public LEDControl(int ePort, int iPort, int bPort, int sPort) {
 
-        enablePin = new DigitalOutput(ePort);
-        intakePin = new DigitalOutput(ePort);
-        ballPin = new DigitalOutput(ePort);
-        shootingPin = new DigitalOutput(ePort);
+        enablePin = new Relay(ePort);
+        intakePin = new Relay(ePort);
+        ballPin = new Relay(ePort);
+        shootingPin = new Relay(ePort);
 
     }
 
@@ -40,34 +42,34 @@ public class LEDControl {
     public void performMainProcessing() {
         switch (currentMode) {
         case DISABLE:
-            enablePin.set(false);
-            intakePin.set(false);
-            ballPin.set(false);
-            shootingPin.set(false);
+            enablePin.set(kFalse);
+            intakePin.set(kFalse);
+            ballPin.set(kFalse);
+            shootingPin.set(kFalse);
             break;
         case ENABLE:
-            enablePin.set(true);
-            intakePin.set(false);
-            ballPin.set(false);
-            shootingPin.set(false);
+            enablePin.set(kTrue);
+            intakePin.set(kFalse);
+            ballPin.set(kFalse);
+            shootingPin.set(kFalse);
             break;
         case INTAKE:
-            enablePin.set(true);
-            intakePin.set(true);
-            ballPin.set(false);
-            shootingPin.set(false);
+            enablePin.set(kTrue);
+            intakePin.set(kTrue);
+            ballPin.set(kFalse);
+            shootingPin.set(kFalse);
             break;
         case FULL:
-            enablePin.set(true);
-            intakePin.set(false);
-            ballPin.set(true);
-            shootingPin.set(false);
+            enablePin.set(kTrue);
+            intakePin.set(kFalse);
+            ballPin.set(kTrue);
+            shootingPin.set(kFalse);
             break;
         case SHOOT:
-            enablePin.set(true);
-            intakePin.set(false);
-            ballPin.set(false);
-            shootingPin.set(true);
+            enablePin.set(kTrue);
+            intakePin.set(kFalse);
+            ballPin.set(kFalse);
+            shootingPin.set(kTrue);
             break;
         default:
             break;

@@ -51,14 +51,6 @@
 		<width>99</width>
 		<height>33</height>
 	</widget>
-	<widget field="Estimated Arm Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.SimpleDial">
-		<location x="1107" y="73"/>
-		<width>184</width>
-		<height>96</height>
-		<property name="Upper Limit" value="95.0"/>
-		<property name="Lower Limit" value="-95.0"/>
-		<property name="Tick Interval" value="15.0"/>
-	</widget>
 	<widget field="Collecting:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="1308" y="104"/>
 		<width>113</width>

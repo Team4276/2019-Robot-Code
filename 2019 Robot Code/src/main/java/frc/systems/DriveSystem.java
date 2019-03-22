@@ -11,15 +11,19 @@ import frc.robot.Robot;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Notifier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import frc.utilities.Constants;
 import frc.utilities.SoftwareTimer;
+import frc.utilities.Toggler;
+import frc.utilities.LogJoystick;
 
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.PathfinderFRC;
@@ -47,7 +51,10 @@ public class DriveSystem {
     private boolean isShifting = false;
     private boolean isDeploying = false;
     private Gear currentGear = Gear.HI;
-    private DriveMode currentMode = DriveMode.ARCADE;
+    private boolean brakeModeisEngaged;
+    private final DriveMode DEFAULT_MODE = DriveMode.ARCADE;
+    private DriveMode currentMode = DEFAULT_MODE;
+    private String currentMode_s = "Arcade";
 
     VictorSP flDrive, mlDrive, blDrive, frDrive, mrDrive, brDrive;
     VictorSPX flDriveX, mlDriveX, blDriveX, frDriveX, mrDriveX, brDriveX;
@@ -55,8 +62,10 @@ public class DriveSystem {
     private double rightPower = 0;
     private double hatchDeployHiGear = -0.25;
     private double hatchDeployLoGear = -0.5;
-
-    private boolean methodInit = true;
+    double desired_heading = 0;
+    int count = 0;
+    private Toggler modeToggler;
+    public boolean methodInit = true;
     private Notifier m_follower_notifier;
 
     double deadband = 0.05;
@@ -65,6 +74,7 @@ public class DriveSystem {
             int shifterHi, int shifterLo, int m_right_encoderPortA, int m_right_encoderPortB, int m_left_encoderPortA,
             int m_left_encoderPortB) {
 
+        modeToggler = new Toggler(LogJoystick.B1);
         shiftTimer = new SoftwareTimer();
         driveTimer = new SoftwareTimer();
         m_right_encoder = new Encoder(m_right_encoderPortA, m_right_encoderPortB);
@@ -108,6 +118,7 @@ public class DriveSystem {
             frDriveX.set(ControlMode.PercentOutput, rightPow);
             mrDriveX.set(ControlMode.PercentOutput, rightPow);
             brDriveX.set(ControlMode.PercentOutput, rightPow);
+
         } else {
             flDrive.set(leftPow);
             mlDrive.set(leftPow);
@@ -126,16 +137,42 @@ public class DriveSystem {
 
     public void operatorDrive() {
 
+        changeMode();
         checkForGearShift();
 
+        if (Robot.leftJoystick.getRawButton(1)) {
+            if (Robot.visionTargetInfo.isCargoBayDetected != 0) {
+                currentMode = DriveMode.AUTO;
+            } else {
+                currentMode = DEFAULT_MODE;
+            }
+        } else {
+            currentMode = DEFAULT_MODE;
+        }
+
         isDeploying = false;
+
+        if (currentMode == DriveMode.AUTO) {
+            currentMode_s = "Auto";
+        } else if (currentMode == DriveMode.ARCADE) {
+            currentMode_s = "Arcade";
+        } else {
+            currentMode_s = "Tank";
+        }
 
         double leftY = 0;
         double rightY = 0;
 
         switch (currentMode) {
-        case ARCADE:
 
+        case AUTO:
+
+            rotateCam(4, Robot.visionTargetInfo.visionPixelX);
+
+            break;
+
+        case ARCADE:
+            methodInit = true;
             double linear = 0;
             double turn = 0;
 
@@ -148,29 +185,34 @@ public class DriveSystem {
 
             leftY = -linear - turn;
             rightY = linear - turn;
+            if (!isShifting) {
+                assignMotorPower(rightY, leftY);
+            } else {
+
+                assignMotorPower(0, 0);
+            }
 
             break;
 
         case TANK:
 
+            methodInit = true;
             if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
-                leftY = -Math.pow(Robot.leftJoystick.getY(), 3);
+                rightY = -Math.pow(Robot.leftJoystick.getY(), 3 / 2);
             }
             if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-                rightY = Math.pow(Robot.rightJoystick.getY(), 3 / 2);
+                leftY = Math.pow(Robot.rightJoystick.getY(), 3 / 2);
             }
+            if (!isShifting) {
+                assignMotorPower(rightY, leftY);
+            } else {
 
+                assignMotorPower(0, 0);
+            }
             break;
 
         default:
             break;
-        }
-
-        if (!isShifting) {
-            assignMotorPower(rightY, leftY);
-        } else {
-
-            assignMotorPower(0, 0);
         }
 
         updateTelemetry();
@@ -225,7 +267,7 @@ public class DriveSystem {
     }
 
     public enum DriveMode {
-        TANK, ARCADE
+        TANK, ARCADE, AUTO
     }
 
     /**
@@ -270,6 +312,27 @@ public class DriveSystem {
             gearShifter.set(Constants.LO_GEAR_VALUE);
         } else {
             isShifting = false;
+        }
+
+    }
+
+    public void changeMode() {
+        modeToggler.updateMechanismStateRJoy();
+        brakeModeisEngaged = modeToggler.getMechanismState();
+        if (brakeModeisEngaged) {
+            flDriveX.setNeutralMode(NeutralMode.Brake);
+            mlDriveX.setNeutralMode(NeutralMode.Brake);
+            blDriveX.setNeutralMode(NeutralMode.Brake);
+            frDriveX.setNeutralMode(NeutralMode.Brake);
+            mrDriveX.setNeutralMode(NeutralMode.Brake);
+            brDriveX.setNeutralMode(NeutralMode.Brake);
+        } else {
+            flDriveX.setNeutralMode(NeutralMode.Coast);
+            mlDriveX.setNeutralMode(NeutralMode.Coast);
+            blDriveX.setNeutralMode(NeutralMode.Coast);
+            frDriveX.setNeutralMode(NeutralMode.Coast);
+            mrDriveX.setNeutralMode(NeutralMode.Coast);
+            brDriveX.setNeutralMode(NeutralMode.Coast);
         }
 
     }
@@ -327,24 +390,29 @@ public class DriveSystem {
     }
 
     public boolean rotateCam(double targetTime, double targetPixel) {
-        double desired_heading = 0;
-        double degppixel = 170 / 640;// tentative
+
+        double degppixel = (0.170615413);// tentative
+
         if (methodInit) {
-            desired_heading = Robot.mImu.getYaw() + ((targetPixel - 320) * degppixel);
+            desired_heading = Robot.mImu.getYaw() + ((targetPixel - 280) * degppixel);
             driveTimer.setTimer(targetTime);
             methodInit = false;
+            SmartDashboard.putBoolean("reached init", true);
+
+            SmartDashboard.putNumber("target", targetPixel);
+            count++;
+            SmartDashboard.putNumber("count", count);
         }
         double P_turn = Constants.regDrivePIDs[Constants.P];
         double heading_difference = desired_heading - Robot.mImu.getYaw();
         double turn = P_turn * heading_difference;
 
-        assignMotorPower(turn, -turn);
+        SmartDashboard.putNumber("Turn", turn);
+        SmartDashboard.putNumber("diff", heading_difference);
+        SmartDashboard.putNumber("goal", desired_heading);
 
-        if (driveTimer.isExpired()) {
-            assignMotorPower(0, 0);
-            methodInit = true;
-            return true;
-        }
+        assignMotorPower(-turn, -turn);
+
         return false;
     }
 
@@ -433,12 +501,14 @@ public class DriveSystem {
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());
         // shifting status
         SmartDashboard.putBoolean("Shifting", isShifting);
+        SmartDashboard.putString("Drive Mode", currentMode_s);
         // current gear
         SmartDashboard.putBoolean("HI Gear", (currentGear == Gear.HI));
         SmartDashboard.putBoolean("LOW Gear", (currentGear == Gear.LO));
         // power outputs
         SmartDashboard.putNumber("Right Power", rightPower);
         SmartDashboard.putNumber("Left Power", leftPower);
+
         // Deploy hatch
         SmartDashboard.putBoolean("Hatch Back Up", isDeploying);
     }

@@ -60,6 +60,74 @@ public class Toggler {
 			}
 		}
 	}
+
+	public void updateMechanismStateRJoy() {
+		previousButtonStatus = currentButtonStatus;
+		currentButtonStatus = Robot.rightJoystick.getRawButton(button);
+		if (currentButtonStatus == true) {
+			if (previousButtonStatus == false) {
+				if (state == true) {
+					state = false;
+				} else {
+					state = true;
+				}
+			}
+		}
+	}
+
+	public void updateMechanismStateRJoy(double triggerValue) {
+		previousButtonStatus = currentButtonStatus;
+		if (triggerValue > 0) {
+			currentButtonStatus = (Robot.rightJoystick.getRawAxis(button) >= triggerValue);
+
+		} else {
+			currentButtonStatus = (Robot.rightJoystick.getRawAxis(button) <= triggerValue);
+		}
+		if (currentButtonStatus == true) {
+			if (previousButtonStatus == false) {
+				if (state == true) {
+					state = false;
+				} else {
+					state = true;
+				}
+			}
+		}
+
+	}
+	
+	public void updateMechanismStateLJoy() {
+		previousButtonStatus = currentButtonStatus;
+		currentButtonStatus = Robot.leftJoystick.getRawButton(button);
+		if (currentButtonStatus == true) {
+			if (previousButtonStatus == false) {
+				if (state == true) {
+					state = false;
+				} else {
+					state = true;
+				}
+			}
+		}
+	}
+	
+	public void updateMechanismStateLJoy(double triggerValue) {
+		previousButtonStatus = currentButtonStatus;
+		if (triggerValue > 0) {
+			currentButtonStatus = (Robot.leftJoystick.getRawAxis(button) >= triggerValue);
+
+		} else {
+			currentButtonStatus = (Robot.leftJoystick.getRawAxis(button) <= triggerValue);
+		}
+		if (currentButtonStatus == true) {
+			if (previousButtonStatus == false) {
+				if (state == true) {
+					state = false;
+				} else {
+					state = true;
+				}
+			}
+		}
+
+	}
 	
 	public void setMechanismState(boolean desiredState) {
 		state = desiredState;

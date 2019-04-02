@@ -78,7 +78,7 @@ public class ArmPivot extends Thread implements Runnable {
 
 	private void computeManualPower() {
 		if (Math.abs(Robot.xboxJoystick.getRawAxis(Xbox.LAxisY)) > 0.2) {
-			manualPower = -Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) / 2;
+			manualPower = -Robot.xboxJoystick.getRawAxis(Xbox.LAxisY) ;
 		} else {
 			manualPower = 0;
 		}

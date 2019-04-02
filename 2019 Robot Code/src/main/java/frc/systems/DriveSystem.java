@@ -51,8 +51,8 @@ public class DriveSystem {
     private boolean isShifting = false;
     private boolean isDeploying = false;
     private Gear currentGear = Gear.HI;
-    private boolean brakeModeisEngaged = false;
-    private final DriveMode DEFAULT_MODE = DriveMode.ARCADE;
+    private boolean brakeModeisEngaged = true;
+    private final DriveMode DEFAULT_MODE = DriveMode.TANK;
     private DriveMode currentMode = DEFAULT_MODE;
     private String currentMode_s = "Arcade";
 
@@ -145,11 +145,11 @@ public class DriveSystem {
         checkForGearShift();
 
         if (Robot.leftJoystick.getRawButton(1)) {
-            if (Robot.visionTargetInfo.isCargoBayDetected != 0) {
-                currentMode = DriveMode.AUTO;
-            } else {
-                currentMode = DEFAULT_MODE;
-            }
+            // if (Robot.visionTargetInfo.isCargoBayDetected != 0) {
+            currentMode = DriveMode.AUTO;
+            /*
+             * } else { currentMode = DEFAULT_MODE; }
+             */
         } else {
             currentMode = DEFAULT_MODE;
         }
@@ -171,7 +171,8 @@ public class DriveSystem {
 
         case AUTO:
 
-            rotateCam(4, Robot.visionTargetInfo.visionPixelX);
+            // rotateCam(4, Robot.visionTargetInfo.visionPixelX);
+            driveFwd(4, .25);
 
             break;
 
@@ -367,13 +368,8 @@ public class DriveSystem {
 
         double turn = P_turn * heading_difference;
 
-        assignMotorPower(power + turn, power - turn);
+        assignMotorPower(power, -power );
 
-        if (driveTimer.isExpired()) {
-            assignMotorPower(0, 0);
-            methodInit = true;
-            return true;
-        }
         return false;
     }
 

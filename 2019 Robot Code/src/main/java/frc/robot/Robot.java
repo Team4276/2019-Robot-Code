@@ -134,9 +134,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    SmartDashboard.putNumber("XX Pixel", visionTargetInfo.visionPixelX);
+    SmartDashboard.putBoolean("XTarget Acquired", (visionTargetInfo.isCargoBayDetected != 0));
     mLED.performMainProcessing();
-    SmartDashboard.putNumber("X Pixel", visionTargetInfo.visionPixelX);
-    SmartDashboard.putBoolean("Target Acquired", (visionTargetInfo.isCargoBayDetected != 0));
   }
 
   /**
@@ -174,8 +174,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     isEnabled = true;
 
-    robotCameraSystem.mainCamera.setExposureHoldCurrent();
-
+    
     super.teleopInit();
   }
 

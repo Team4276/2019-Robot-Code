@@ -25,9 +25,9 @@ public class LEDControl {
     public LEDControl(int ePort, int iPort, int bPort, int sPort) {
 
         enablePin = new Relay(ePort);
-        intakePin = new Relay(ePort);
-        ballPin = new Relay(ePort);
-        shootingPin = new Relay(ePort);
+        intakePin = new Relay(iPort);
+        ballPin = new Relay(bPort);
+        shootingPin = new Relay(sPort);
 
     }
 

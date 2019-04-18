@@ -9,8 +9,8 @@ public class Cameras {
 	public UsbCamera mainCamera;
 	// UsbCamera armCamera;
 
-	private final int MAIN_RES_X = 320;
-	private final int MAIN_RES_Y = 240;
+	private final int MAIN_RES_X = 267;
+	private final int MAIN_RES_Y = 200;
 	private final int MAIN_FPS = 25;
 	private final int MAIN_EXPOSURE = 10;
 
@@ -22,8 +22,6 @@ public class Cameras {
 		mainCamera.setResolution(MAIN_RES_X, MAIN_RES_Y);
 		mainCamera.setFPS(MAIN_FPS);
 		//mainCamera.setExposureAuto();
-		mainCamera.setExposureManual(30);
-		mainCamera.setExposureHoldCurrent();
 		mainCamera.setExposureManual(30);
 		mainCamera.setExposureHoldCurrent();
 		

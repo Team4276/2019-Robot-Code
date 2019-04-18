@@ -1,5 +1,22 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Auto Selector" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="492"/>
+	</widget>
+	<widget field="XTarget Acquired" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="1060" y="287"/>
+		<width>190</width>
+		<height>36</height>
+	</widget>
+	<widget field="Estimated Arm Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="575" y="0"/>
+	</widget>
+	<widget field="Drive Mode" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="513"/>
+	</widget>
+	<widget field="XX Pixel" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1070" y="264"/>
+	</widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
 		<location x="2" y="3"/>
 		<width>572</width>
@@ -128,13 +145,92 @@
 		<property name="Image File" value="C:\Users\eric\workspace\2019-Robot-Code\Dashboard\PNGPIX-COM-Crosshair-PNG-Transparent-Image-1-500x500.png"/>
 		<property name="Maintain Aspect Ratio" value="true"/>
 	</static-widget>
+	<widget field="TIME" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="385"/>
+	</widget>
+	<widget field="tele" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="112"/>
+	</widget>
 	<widget field="DOWN" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="143" y="721"/>
 	</widget>
 	<widget field="UP" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="7" y="699"/>
 	</widget>
+	<widget field="Turn" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="15" y="16"/>
+	</widget>
+	<widget field="goal" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="3" y="12"/>
+	</widget>
+	<widget field="diff" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="31" y="10"/>
+	</widget>
+	<widget field="reached init" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="11" y="10"/>
+	</widget>
+	<widget field="count" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="15" y="16"/>
+	</widget>
+	<widget field="target" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="26" y="28"/>
+	</widget>
 </dashboard>
 <live-window>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="Encoder[1]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="16"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,2]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="113"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,6]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="133"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="ADXRS450_Gyro[0]" type="Gyro" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
+			<location x="6" y="153"/>
+			<height>150</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[7]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="303"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,0]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="323"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[6]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="343"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="Encoder[2]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="363"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,4]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="460"/>
+			<height>20</height>
+			<width>250</width>
+		</widget>
+		<widget field="Encoder[0]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="480"/>
+			<height>97</height>
+			<width>250</width>
+		</widget>
+		<location x="16" y="14"/>
+		<width>262</width>
+		<height>583</height>
+	</widget>
 </live-window>
 </xml>

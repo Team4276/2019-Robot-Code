@@ -62,8 +62,10 @@ public class DriveSystem {
     private double rightPower = 0;
     private double hatchDeployHiGear = -0.25;
     private double hatchDeployLoGear = -0.5;
-    private double climbDelayTime = 1;// seconds
-    private double retractDelayTime = 3;// seconds
+    private double climbDelayTime = 3;// seconds
+    private double retractDelayTime = 2;// seconds
+    private double pullupDelayTime = 1;// seconds
+    private double contDelayTime = 1.5;// seconds
     private double climbPower = .1;// seconds
     private int timerNum = 1;
     double desired_heading = 0;
@@ -144,12 +146,11 @@ public class DriveSystem {
         changeMode();
         checkForGearShift();
 
-        if (Robot.leftJoystick.getRawButton(1)) {
-            // if (Robot.visionTargetInfo.isCargoBayDetected != 0) {
+        if (Robot.rightJoystick.getRawButton(1)) {
             currentMode = DriveMode.AUTO;
-            /*
-             * } else { currentMode = DEFAULT_MODE; }
-             */
+
+        } else if (Robot.rightJoystick.getRawButton(2)) {
+            currentMode = DriveMode.CLIMB;
         } else {
             currentMode = DEFAULT_MODE;
         }
@@ -170,9 +171,9 @@ public class DriveSystem {
         switch (currentMode) {
 
         case AUTO:
+            rotateCam(4, Robot.visionTargetInfo.visionPixelX);
 
-            // rotateCam(4, Robot.visionTargetInfo.visionPixelX);
-            driveFwd(4, .25);
+            // driveFwd(4, .25);
 
             break;
 
@@ -208,11 +209,11 @@ public class DriveSystem {
         case TANK:
 
             resetAuto();
-            if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
-                rightY = -Math.pow(Robot.leftJoystick.getY(), 3 / 2);
-            }
             if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-                leftY = Math.pow(Robot.rightJoystick.getY(), 3 / 2);
+                rightY = -Math.pow(Robot.rightJoystick.getY(), 3 / 2);
+            }
+            if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
+                leftY = Math.pow(Robot.leftJoystick.getY(), 3 / 2);
             }
             if (!isShifting) {
                 assignMotorPower(rightY, leftY);
@@ -234,8 +235,8 @@ public class DriveSystem {
      * power drive motors while shifting
      */
     public void checkForGearShift() {
-        boolean shiftHi = Robot.rightJoystick.getRawButton(HI_SHIFTER);
-        boolean shiftLo = Robot.rightJoystick.getRawButton(LO_SHIFTER);
+        boolean shiftHi = Robot.leftJoystick.getRawButton(HI_SHIFTER);
+        boolean shiftLo = Robot.leftJoystick.getRawButton(LO_SHIFTER);
 
         if (shiftHi) {
             currentGear = Gear.HI;
@@ -328,7 +329,7 @@ public class DriveSystem {
     }
 
     public void changeMode() {
-        modeToggler.updateMechanismStateRJoy();
+        modeToggler.updateMechanismStateLJoy();
         brakeModeisEngaged = modeToggler.getMechanismState();
         if (brakeModeisEngaged) {
             flDriveX.setNeutralMode(NeutralMode.Brake);
@@ -368,35 +369,77 @@ public class DriveSystem {
 
         double turn = P_turn * heading_difference;
 
-        assignMotorPower(power, -power );
+        assignMotorPower(power, -power);
 
         return false;
     }
 
     public boolean climb() {
 
+        double stage1pow = .25;
+        double stage2pow = .3;
+
+        // 1. bring arm down
+        Robot.mArmPivot.commandSetpoint(-90);
+
         if (methodInit) {
+            // start timer for jack extend
             driveTimer.setTimer(climbDelayTime);
+            assignMotorPower(stage1pow, -stage1pow);// creep forward while bring arm down
+
             methodInit = false;
-            timerNum = 1;
-            Robot.mArmPivot.commandSetpoint(-90);
+
+            timerNum = 0;
+            timerNum++;
+
+            SmartDashboard.putNumber("init", 1);
         }
 
         if (driveTimer.isExpired()) {
-            if (timerNum == 1) {
-                Robot.mClimbingJack.setJack(true);
-                timerNum++;
-                driveTimer.setTimer(retractDelayTime);
-            } else if (timerNum == 2) {
-                Robot.mClimbingJack.setJack(false);
-                timerNum++;
-            } else {
-                assignMotorPower(0, 0);
-                return true;
-            }
-        }
 
-        assignMotorPower(-climbPower, climbPower);
+            SmartDashboard.putNumber("sequence:", timerNum);
+            switch (timerNum) {
+            case 1:
+                // 2. extend jack and drive
+                Robot.mClimbingJack.setJack(true);
+                assignMotorPower(stage1pow, -stage1pow);// creep forward while lifting back end
+                timerNum++;
+
+                // wait for piston to extend
+                driveTimer.setTimer(pullupDelayTime);
+                break; // timer for arm down expired
+
+            case 2:
+                // 3. drive foward
+                assignMotorPower(stage2pow, -stage2pow);// drive forward once back end up
+                timerNum++;
+
+                // wait to drive forward
+                driveTimer.setTimer(retractDelayTime);
+                break;// timer for piston extension expired
+
+            case 3:
+                // 4. retract jack
+                Robot.mClimbingJack.setJack(false);
+                assignMotorPower(stage1pow, -stage1pow);// creep forward while lifting piston
+                timerNum++;
+
+                // continue to drive forward
+                driveTimer.setTimer(contDelayTime);
+                break; // timer for piston retract expired
+
+            case 4:
+                // 5. stop all
+                assignMotorPower(0, 0); // full stop
+                return true;
+            // break;
+
+            default:
+                assignMotorPower(0, 0); // full stop
+                return false;
+            // break;
+            }
+        } // some timer has expired
         return false;
     }
 
@@ -429,27 +472,42 @@ public class DriveSystem {
 
     public boolean rotateCam(double targetTime, double targetPixel) {
 
+        double leftbias = 1.01;
+        double rightbias = 1.0;
         double degppixel = (0.170615413);// tentative
+        double centerPixel = 250;
 
         if (methodInit) {
-            desired_heading = Robot.mImu.getYaw() + ((targetPixel - 280) * degppixel);
-            driveTimer.setTimer(targetTime);
-            methodInit = false;
-            SmartDashboard.putBoolean("reached init", true);
+            if (Robot.visionTargetInfo.isCargoBayDetected != 0) {
+                desired_heading = Robot.mImu.getYaw() + ((targetPixel - centerPixel) * degppixel);
+                driveTimer.setTimer(targetTime);
+                methodInit = false;
+            } // if found vision target then calculate heading and prevent init repeat
+            else {
+                desired_heading = Robot.mImu.getYaw();
+            } // if target not found hold current heading
 
+            SmartDashboard.putBoolean("reached init", true);
             SmartDashboard.putNumber("target", targetPixel);
+            // log how many times init runs
+            // it repeats if doesnt find target
             count++;
             SmartDashboard.putNumber("count", count);
         }
-        double P_turn = Constants.regDrivePIDs[Constants.P];
+        double P_turn = Constants.regDrivePIDs[Constants.P]; // full power at ~30 deg offset
         double heading_difference = desired_heading - Robot.mImu.getYaw();
         double turn = P_turn * heading_difference;
-
+        double linear = Robot.rightJoystick.getY();
+        double manTurn = 0;
+        if (Math.abs(Robot.rightJoystick.getTwist()) > 0.4) {
+            manTurn = Robot.rightJoystick.getTwist() / 3;
+        }
         SmartDashboard.putNumber("Turn", turn);
         SmartDashboard.putNumber("diff", heading_difference);
         SmartDashboard.putNumber("goal", desired_heading);
+        SmartDashboard.putNumber("Manual turn", manTurn);
 
-        assignMotorPower(-turn, -turn);
+        assignMotorPower(-linear * rightbias - turn - manTurn, linear * leftbias - turn - manTurn);
 
         return false;
     }

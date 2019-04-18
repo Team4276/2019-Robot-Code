@@ -35,7 +35,7 @@ public class ArmPivot extends Thread implements Runnable {
 	private double DERIVATIVE_GAIN = -3450e-6;
 	private final double STARTING_ANGLE = DOWN_SETPOINT;
 	private final double SETPOINT_INCREMENT = 5; // deg
-	private final double MAX_POWER = 0.8;
+	private final double MAX_POWER = 1.0;
 	private final double UPPER_LIMIT = 20;
 	private final double LOWER_LIMIT = -90;
 	private final double DEGREES_PER_PULSE = (-0.2036244521);

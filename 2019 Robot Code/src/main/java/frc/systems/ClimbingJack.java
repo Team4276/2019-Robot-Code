@@ -45,6 +45,7 @@ public class ClimbingJack {
             /*
              * if (climbInit) { climbTimer.setTimer(pistonDelay); climbInit = false; }
              */
+            SmartDashboard.putNumber("tele", 1);
             SmartDashboard.putBoolean("climbinit", climbInit);
             if ((Robot.xboxJoystick.getRawButton(Xbox.RAxis))) {
                 isJacked = true;
@@ -54,10 +55,17 @@ public class ClimbingJack {
             }
 
         } else if (!elsewhereCommanded){
+            
+            SmartDashboard.putNumber("tele", 2);
             climbInit = true;
             isClimbing = false;
             isJacked = false;
             jackSolenoid.set(kRetract);
+        }
+        else{
+            
+            jackSolenoid.set(kLift);
+            SmartDashboard.putNumber("tele", 3);
         }
         updateTelemetry();
     }
@@ -69,7 +77,6 @@ public class ClimbingJack {
             isJacked = true;
         } else {
             elsewhereCommanded = false;
-            jackSolenoid.set(kRetract);
             isJacked = false;
         }
 

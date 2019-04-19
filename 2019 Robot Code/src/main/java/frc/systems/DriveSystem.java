@@ -62,12 +62,13 @@ public class DriveSystem {
     private double rightPower = 0;
     private double hatchDeployHiGear = -0.25;
     private double hatchDeployLoGear = -0.5;
-    private double climbDelayTime = 3;// seconds
+    private double climbDelayTime = 1.5;// seconds
+    private double driveFDelay = 0.8;
     private double retractDelayTime = 2;// seconds
     private double pullupDelayTime = 1;// seconds
     private double contDelayTime = 1.5;// seconds
     private double climbPower = .1;// seconds
-    private int timerNum = 1;
+    private int timerNum = 0;
     double desired_heading = 0;
     int count = 0;
     private Toggler modeToggler;
@@ -81,6 +82,8 @@ public class DriveSystem {
             int m_left_encoderPortB) {
 
         modeToggler = new Toggler(LogJoystick.B1);
+        modeToggler.setMechanismState(true); // sets to bracke mode
+
         shiftTimer = new SoftwareTimer();
         driveTimer = new SoftwareTimer();
         m_right_encoder = new Encoder(m_right_encoderPortA, m_right_encoderPortB);
@@ -385,12 +388,11 @@ public class DriveSystem {
         if (methodInit) {
             // start timer for jack extend
             driveTimer.setTimer(climbDelayTime);
-            assignMotorPower(stage1pow, -stage1pow);// creep forward while bring arm down
 
             methodInit = false;
 
             timerNum = 0;
-            timerNum++;
+            
 
             SmartDashboard.putNumber("init", 1);
         }
@@ -399,6 +401,16 @@ public class DriveSystem {
 
             SmartDashboard.putNumber("sequence:", timerNum);
             switch (timerNum) {
+
+            case 0:
+                // 1. extend jack and drive
+                assignMotorPower(stage1pow, -stage1pow);// creep forward while bring arm down
+                timerNum++;
+
+                // wait for piston to extend
+                driveTimer.setTimer(driveFDelay);
+                break; // timer for arm down expired
+
             case 1:
                 // 2. extend jack and drive
                 Robot.mClimbingJack.setJack(true);
@@ -607,6 +619,9 @@ public class DriveSystem {
 
         // Deploy hatch
         SmartDashboard.putBoolean("Hatch Back Up", isDeploying);
+
+        // Check Coast/Brake
+        SmartDashboard.putBoolean("Brake Mode", brakeModeisEngaged);
     }
 
 }

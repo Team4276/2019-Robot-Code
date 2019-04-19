@@ -1,5 +1,14 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Manual turn" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="575" y="169"/>
+	</widget>
+	<widget field="sequence:" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="575" y="21"/>
+	</widget>
+	<widget field="init" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="625"/>
+	</widget>
 	<widget field="Auto Selector" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="492"/>
 	</widget>
@@ -35,7 +44,7 @@
 		<location x="0" y="583"/>
 	</widget>
 	<widget field="Climbing:" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="562"/>
+		<location x="1" y="578"/>
 	</widget>
 	<widget field="video mode" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="541"/>
@@ -145,6 +154,9 @@
 		<property name="Image File" value="C:\Users\eric\workspace\2019-Robot-Code\Dashboard\PNGPIX-COM-Crosshair-PNG-Transparent-Image-1-500x500.png"/>
 		<property name="Maintain Aspect Ratio" value="true"/>
 	</static-widget>
+	<widget field="Brake Mode" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="816" y="458"/>
+	</widget>
 	<widget field="TIME" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="385"/>
 	</widget>
@@ -228,7 +240,7 @@
 			<height>97</height>
 			<width>250</width>
 		</widget>
-		<location x="16" y="14"/>
+		<location x="0" y="0"/>
 		<width>262</width>
 		<height>583</height>
 	</widget>

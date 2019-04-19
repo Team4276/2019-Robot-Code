@@ -9,8 +9,8 @@ public class Cameras {
 	public UsbCamera mainCamera;
 	// UsbCamera armCamera;
 
-	private final int MAIN_RES_X = 267;
-	private final int MAIN_RES_Y = 200;
+	private final int MAIN_RES_X = 240;
+	private final int MAIN_RES_Y = 180;
 	private final int MAIN_FPS = 25;
 	private final int MAIN_EXPOSURE = 10;
 

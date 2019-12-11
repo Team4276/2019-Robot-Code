@@ -8,6 +8,7 @@
 package frc.systems;
 
 import frc.robot.Robot;
+import frc.systems.sensors.Limelight;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
@@ -174,9 +175,9 @@ public class DriveSystem {
         switch (currentMode) {
 
         case AUTO:
-            rotateCam(4, Robot.visionTargetInfo.visionPixelX);
-
+            //rotateCam(4, Robot.visionTargetInfo.visionPixelX);
             // driveFwd(4, .25);
+            LimelightTest();
 
             break;
 
@@ -454,6 +455,12 @@ public class DriveSystem {
         } // some timer has expired
         return false;
     }
+
+    public void LimelightTest(){
+        Robot.mLimelight.setLedMode(3);
+        Robot.mLimelight.RotateTracking();
+        assignMotorPower(Robot.mLimelight.rightSteering, Robot.mLimelight.leftSteering);
+     }
 
     public void resetAuto() {
         methodInit = true;

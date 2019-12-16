@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -8,7 +9,6 @@
 package frc.systems;
 
 import frc.robot.Robot;
-import frc.systems.sensors.Limelight;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
@@ -26,18 +26,7 @@ import frc.utilities.SoftwareTimer;
 import frc.utilities.Toggler;
 import frc.utilities.LogJoystick;
 
-import jaci.pathfinder.Pathfinder;
-import jaci.pathfinder.PathfinderFRC;
-import jaci.pathfinder.Trajectory;
-import jaci.pathfinder.Waypoint;
-import jaci.pathfinder.modifiers.TankModifier;
-import jaci.pathfinder.followers.EncoderFollower;
-
 public class DriveSystem {
-
-    private EncoderFollower m_left_follower;
-    private EncoderFollower m_right_follower;
-
     private Encoder m_left_encoder;
     private Encoder m_right_encoder;
 
@@ -78,6 +67,14 @@ public class DriveSystem {
 
     double deadband = 0.05;
 
+    // Cheesy Drive Constants
+    public static final double kDefaultQuickStopThreshold = 0.2;
+    public static final double kDefaultQuickStopAlpha = 0.1;
+
+    private double m_quickStopThreshold = kDefaultQuickStopThreshold;
+    private double m_quickStopAlpha = kDefaultQuickStopAlpha;
+    private double m_quickStopAccumulator;
+    
     public DriveSystem(boolean isCAN, int FLport, int MLport, int BLport, int FRport, int MRport, int BRport,
             int shifterHi, int shifterLo, int m_right_encoderPortA, int m_right_encoderPortB, int m_left_encoderPortA,
             int m_left_encoderPortB) {
@@ -144,7 +141,15 @@ public class DriveSystem {
     /**
      * manual operator controlled drive
      */
-
+    protected double limit(double value) {
+        if (value > 1.0) {
+            return 1.0;
+        }
+        if (value < -1.0) {
+            return -1.0;
+        }
+        return value;
+    }
     public void operatorDrive() {
 
         changeMode();
@@ -179,8 +184,94 @@ public class DriveSystem {
             // driveFwd(4, .25);
             LimelightTest();
 
+
             break;
 
+        case CHEESY:
+
+            resetAuto();
+
+            double xSpeed = 0;
+            double zRotation = 0;
+            double left = 0;
+            double right = 0;
+            boolean isQuickTurn;
+
+            if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
+                zRotation = -Robot.rightJoystick.getY();
+            }
+            if (Math.abs(Robot.leftJoystick.getX()) > deadband) {
+                xSpeed = Math.pow(Robot.leftJoystick.getX(), 3);
+            }
+
+            if (Robot.rightJoystick.getRawButton(2)) {
+                isQuickTurn = true;
+            } else {
+                isQuickTurn = false;
+            }
+
+            xSpeed = limit(xSpeed);
+
+            zRotation = limit(zRotation);
+
+            double angularPower;
+            boolean overPower;
+
+            if (isQuickTurn) {
+                if (Math.abs(xSpeed) < m_quickStopThreshold) {
+                    m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
+                            + m_quickStopAlpha * limit(zRotation) * 2;
+                }
+                overPower = true;
+                angularPower = zRotation;
+            } else {
+                overPower = false;
+                angularPower = Math.abs(xSpeed) * zRotation - m_quickStopAccumulator;
+
+                if (m_quickStopAccumulator > 1) {
+                    m_quickStopAccumulator -= 1;
+                } else if (m_quickStopAccumulator < -1) {
+                    m_quickStopAccumulator += 1;
+                } else {
+                    m_quickStopAccumulator = 0.0;
+                }
+            }
+
+            left = xSpeed + angularPower;
+            right = xSpeed - angularPower;
+
+            // If rotation is overpowered, reduce both outputs to within acceptable range
+            if (overPower) {
+                if (left > 1.0) {
+                    right -= left - 1.0;
+                    left = 1.0;
+                } else if (right > 1.0) {
+                    left -= right - 1.0;
+                    right = 1.0;
+                } else if (left < -1.0) {
+                    right -= left + 1.0;
+                    left = -1.0;
+                } else if (right < -1.0) {
+                    left -= right + 1.0;
+                    right = -1.0;
+                }
+            }
+
+            // Normalize the wheel speeds
+            double maxMagnitude = Math.max(Math.abs(left), Math.abs(right));
+            if (maxMagnitude > 1.0) {
+                left /= maxMagnitude;
+                right /= maxMagnitude;
+
+            }
+            if (!isShifting) {
+                assignMotorPower(right, left);
+            } else {
+
+                assignMotorPower(0, 0);
+            }
+
+            break;
         case CLIMB:
 
             climb();
@@ -211,6 +302,9 @@ public class DriveSystem {
             break;
 
         case TANK:
+
+        //Robot.mLimelight.setCamMode(1);
+        //Robot.mLimelight.setLedMode(1);
 
             resetAuto();
             if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
@@ -283,7 +377,7 @@ public class DriveSystem {
     }
 
     public enum DriveMode {
-        TANK, ARCADE, AUTO, CLIMB
+        TANK, ARCADE, AUTO, CLIMB, CHEESY
     }
 
     /**
@@ -457,9 +551,9 @@ public class DriveSystem {
     }
 
     public void LimelightTest(){
-        Robot.mLimelight.setLedMode(3);
+        //Robot.mLimelight.setLedMode(3);
         Robot.mLimelight.RotateTracking();
-        assignMotorPower(Robot.mLimelight.rightSteering, Robot.mLimelight.leftSteering);
+        assignMotorPower(-Robot.mLimelight.rightSteering, Robot.mLimelight.leftSteering);
      }
 
     public void resetAuto() {
@@ -531,77 +625,7 @@ public class DriveSystem {
         return false;
     }
 
-    public boolean drivePath(String pathFileName) {
 
-        Trajectory left_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".right");
-        Trajectory right_trajectory = PathfinderFRC.getTrajectory(pathFileName + ".left");
-
-        m_left_follower = new EncoderFollower(left_trajectory);
-        m_right_follower = new EncoderFollower(right_trajectory);
-
-        m_left_follower.configureEncoder(m_left_encoder.get(), Constants.TickPRev, Constants.wheelDiam);
-        // You must tune the PID values on the following line!
-        m_left_follower.configurePIDVA(Constants.kP, Constants.kI, Constants.kD, Constants.kV, Constants.kA);
-
-        m_right_follower.configureEncoder(m_right_encoder.get(), Constants.TickPRev, Constants.wheelDiam);
-        // You must tune the PID values on the following line!
-        m_right_follower.configurePIDVA(Constants.kP, Constants.kI, Constants.kD, Constants.kV, Constants.kA);
-
-        m_follower_notifier = new Notifier(this::followPath);
-        m_follower_notifier.startPeriodic(left_trajectory.get(0).dt);
-
-        return false;
-    }
-
-    private void followPath() {
-        if (m_left_follower.isFinished() || m_right_follower.isFinished()) {
-            m_follower_notifier.stop();
-        } else {
-
-            double LVT = m_left_follower.getSegment().velocity;
-            double RVT = m_right_follower.getSegment().velocity;
-
-            double LVA = m_left_encoder.getRate();
-            double RVA = m_right_encoder.getRate();
-
-            double LPT = m_left_follower.getSegment().position;
-            double RPT = m_right_follower.getSegment().position;
-
-            double LPA = m_left_encoder.getDistance();
-            double RPA = m_right_encoder.getDistance();
-
-            double left_speed = m_left_follower.calculate(m_left_encoder.get());
-            double right_speed = m_right_follower.calculate(m_right_encoder.get());
-            double heading = Robot.mImu.getYaw();
-            double desired_heading = Pathfinder.r2d(m_left_follower.getHeading());
-            double heading_difference = Pathfinder.boundHalfDegrees(desired_heading - heading);
-
-            double turn = 0.8 * (-1.0 / 80.0) * heading_difference;
-
-            SmartDashboard.putNumber("Left goal velocity", LVT);
-            SmartDashboard.putNumber("Right goal velocity", RVT);
-
-            SmartDashboard.putNumber("Left actual velocity", LVA);
-            SmartDashboard.putNumber("Right actual velocity", RVA);
-
-            SmartDashboard.putNumber("Left velocity difference", (LVT - LVA));
-            SmartDashboard.putNumber("Right velocity difference", (RVT - RVA));
-
-            SmartDashboard.putNumber("Left goal position", LPT);
-            SmartDashboard.putNumber("Right goal position", RPT);
-
-            SmartDashboard.putNumber("Left actual position", LPA);
-            SmartDashboard.putNumber("Right actual position", RPA);
-
-            SmartDashboard.putNumber("Left position difference", (LPT - LPA));
-            SmartDashboard.putNumber("Right position difference", (RPT - RPA));
-
-            SmartDashboard.putNumber("heading error:", heading_difference);
-            SmartDashboard.putNumber("turn power:", turn);
-
-            assignMotorPower(right_speed - turn, left_speed + turn);
-        }
-    }
 
     /*
      * () public void reset(){ assignMotorPower(rightPow, leftPow); }
@@ -611,6 +635,7 @@ public class DriveSystem {
      */
     public void updateTelemetry() {
         SmartDashboard.putNumber("Heading", Robot.mImu.getYaw());
+        SmartDashboard.putNumber("TX", Robot.mLimelight.getTx());
         // encoder outputs
         SmartDashboard.putNumber("Right Encoder", m_right_encoder.getDistance());
         SmartDashboard.putNumber("Left Encoder", m_left_encoder.getDistance());

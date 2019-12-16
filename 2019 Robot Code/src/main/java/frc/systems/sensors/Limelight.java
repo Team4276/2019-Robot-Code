@@ -19,9 +19,8 @@ public class Limelight {
    double distance = 0.0;
 
   //steering commands
-  final double Kp = 0.03;                    
+  final double Kp = -0.05;                    
   final double minSteer = 0.05;
-
   //driving commands
   final double DRIVE_K = 0.26;                    
   final double DESIRED_TARGET_AREA = 13.0;        
@@ -38,9 +37,12 @@ public class Limelight {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("camMode").setNumber(1);
   }
 
+  
+
   public void RotateTracking()
   {
     setLedMode(3);
+    
     setCamMode(0);
 
         if (tv < 1.0)
@@ -51,23 +53,26 @@ public class Limelight {
           return;
         }
 
-      else if(tv > 1.0){
-
+    
         LimelightHasValidTarget = true;
 
-        double steerError = -tx;
+        double steerError = tx;
         double steerCmd = 0;
-
+/*
         if(tx > 1.0){
           steerCmd = Kp*steerError - minSteer;
         }
         else if(tx < 1.0){
           steerCmd = Kp*steerError + minSteer;
-        }
+        }*/
+        steerCmd = Kp*tx;
 
-        rightSteering += steerCmd;
-        leftSteering -= steerCmd;
-      }
+        rightSteering -= steerCmd;
+        leftSteering += steerCmd;
+        
+      
+      //setCamMode(1);
+      //setLedMode(1);
     }
 
 public void DriveTracking(){
@@ -94,10 +99,22 @@ public double getSteer(double steer){
   return steer;
 }
 
-public void UpdateTelementry(){
-    SmartDashboard.putBoolean("Has Target", LimelightHasValidTarget);
+public double getTx(){
+  return tx;
+}
+
+public void updateTelementry(){
+  tv = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0);
+  tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
+  ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+  ta = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+  ts = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ts").getDouble(0);
+
+  SmartDashboard.putBoolean("Has Target", LimelightHasValidTarget);
     SmartDashboard.putNumber("KP Steering", Kp);
     SmartDashboard.putNumber("ts", ts);
+    SmartDashboard.putNumber("tv", tv);
+    SmartDashboard.putNumber("tx", tx);
 }
 
 }

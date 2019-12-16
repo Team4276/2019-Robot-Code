@@ -137,6 +137,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    mLimelight.updateTelementry();
     SmartDashboard.putNumber("XX Pixel", visionTargetInfo.visionPixelX);
     SmartDashboard.putBoolean("XTarget Acquired", (visionTargetInfo.isCargoBayDetected != 0));
     mLED.performMainProcessing();
@@ -166,9 +167,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    //mDriveSystem.rotateCam(4, visionTargetInfo.visionPixelX);
-    
-  }
+    mLimelight.updateTelementry();
+   //mDriveSystem.rotateCam(4, visionTargetInfo.visionPixelX);
+   }
 
   /**
    * 
@@ -202,7 +203,7 @@ public class Robot extends TimedRobot {
     mCollector.updateTelemetry();
     mEjector.updateTelemetry();
     mClimbingJack.updateTelemetry();
-    mLimelight.UpdateTelementry();
+    mLimelight.updateTelementry();
 
     super.disabledPeriodic();
   }
@@ -212,12 +213,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-  }
+    mLimelight.updateTelementry();
+}
 
   /**
    * This function is called periodically during test mode.
    */
   @Override
   public void testPeriodic() {
+    mLimelight.updateTelementry();
   }
 }

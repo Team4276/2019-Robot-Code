@@ -20,7 +20,7 @@ public class BallLift {
 
 	Value lowPosition = Value.kForward;
 	Value highPosition = Value.kReverse;
-	double backPowerShoot = .5;
+	double backPowerShoot = .55;
 	double backPowerSpit = .4;
 	double frontPower = -.7;
 	double collectPower = -.7;

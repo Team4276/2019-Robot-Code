@@ -16,7 +16,7 @@ import frc.systems.Ejector;
 import frc.systems.LEDControl;
 import frc.systems.sensors.Cameras;
 import frc.systems.sensors.IMU;
-import frc.systems.sensors.ADIS16448_IMU;
+//import frc.systems.sensors.ADIS16448_IMU;
 import frc.systems.sensors.Limelight;
 import frc.utilities.RoboRioPorts;
 import frc.autonomous.DashboardInterface;
@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
   public static Joystick xboxJoystick;
   public static Timer systemTimer;
   public static IMU mImu;
-  public static ADIS16448_IMU robotIMU;
+  //public static ADIS16448_IMU robotIMU;
   public static Limelight mLimelight;
   public static boolean isEnabled;
 

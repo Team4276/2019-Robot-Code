@@ -86,6 +86,8 @@ public class DriveSystem {
         driveTimer = new SoftwareTimer();
         m_right_encoder = new Encoder(m_right_encoderPortA, m_right_encoderPortB);
         m_left_encoder = new Encoder(m_left_encoderPortA, m_left_encoderPortB);
+        m_right_encoder.reset();
+        m_left_encoder.reset();
         if (isCAN) {
             hasCANNetwork = true;
 
@@ -182,7 +184,7 @@ public class DriveSystem {
         case AUTO:
             //rotateCam(4, Robot.visionTargetInfo.visionPixelX);
             // driveFwd(4, .25);
-            LimelightTest();
+            LimelightRotate();
 
 
             break;
@@ -197,11 +199,11 @@ public class DriveSystem {
             double right = 0;
             boolean isQuickTurn;
 
-            if (Math.abs(Robot.rightJoystick.getY()) > deadband) {
-                zRotation = -Robot.rightJoystick.getY();
+            if (Math.abs(Robot.rightJoystick.getX()) > deadband) {
+                zRotation = -Robot.rightJoystick.getX();
             }
-            if (Math.abs(Robot.leftJoystick.getX()) > deadband) {
-                xSpeed = Math.pow(Robot.leftJoystick.getX(), 3);
+            if (Math.abs(Robot.leftJoystick.getY()) > deadband) {
+                xSpeed = Math.pow(Robot.leftJoystick.getY(), 3);
             }
 
             if (Robot.rightJoystick.getRawButton(2)) {
@@ -550,15 +552,27 @@ public class DriveSystem {
         return false;
     }
 
-    public void LimelightTest(){
-        //Robot.mLimelight.setLedMode(3);
+    public void LimelightRotate(){
+        
         Robot.mLimelight.RotateTracking();
         assignMotorPower(-Robot.mLimelight.rightSteering, Robot.mLimelight.leftSteering);
+
      }
+    public void LimelightDrive(){
+
+        Robot.mLimelight.DriveTracking();
+        assignMotorPower(Robot.mLimelight.rightSteering, Robot.mLimelight.leftSteering);
+        
+    }
 
     public void resetAuto() {
         methodInit = true;
         timerNum = 1;
+    }
+
+    public boolean autoDriveTest(double desiredCoordinate){
+
+        return false;
     }
 
     public boolean rotate(double targetTime, double desired_heading) {
